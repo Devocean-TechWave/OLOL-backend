@@ -56,7 +56,7 @@ public class JwtUtil implements InitializingBean {
 	public Claims validateToken(String token, boolean allowExpired) {
 		try {
 			return Jwts.parser().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
-		} catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
+		} catch (SecurityException | MalformedJwtException e) {
 			log.error("잘못된 JWT 서명입니다.");
 		} catch (ExpiredJwtException e) {
 			if (allowExpired) {
