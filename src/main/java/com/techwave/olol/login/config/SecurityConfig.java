@@ -18,23 +18,14 @@ import com.techwave.olol.login.auth.TokenAccessDeniedHandler;
 
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
 	private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
 	private final JwtProvider jwtProvider;
-
-	public static final String[] WHITELIST = {
-		"/v1/users/login/**",
-		"/v1/users/check-nickname",
-		"/images/**",
-		"/swagger-ui/**",
-		"/v3/api-docs/**",
-		"/error",
-		"/test/**"
-	};
+	private final SecurityProperties securityProperties;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -44,10 +35,14 @@ public class SecurityConfig {
 			.formLogin(FormLoginConfigurer::disable)
 			.sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers(WHITELIST).permitAll()
+				.requestMatchers(securityProperties.getWhitelist()).permitAll()
 				.anyRequest().authenticated())
-			.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
+			.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+			.exceptionHandling(exceptionHandling -> exceptionHandling
+				.accessDeniedHandler(tokenAccessDeniedHandler));
 
 		return http.build();
 	}
 }
+
+
