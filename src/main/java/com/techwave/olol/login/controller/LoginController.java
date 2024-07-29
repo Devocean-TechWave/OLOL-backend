@@ -23,7 +23,8 @@ public class LoginController {
 
 	private final LoginService loginService;
 
-	@Operation(summary = "카카오 로그인",
+	@Operation(
+		summary = "카카오 로그인",
 		responses = {
 			@io.swagger.v3.oas.annotations.responses.ApiResponse(
 				responseCode = "200",
@@ -42,3 +43,4 @@ public class LoginController {
 		return ResponseEntity.ok().body(new ApiResponse(dto));
 	}
 }
+
