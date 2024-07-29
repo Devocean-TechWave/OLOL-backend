@@ -34,13 +34,16 @@ public class ImagesService {
 			}
 		} catch (Exception e) {
 			log.error("get profileImage message: {}", e.getMessage());
+			throw new ApiException(Error.NOT_EXIST_IMAGE, e);
 		}
 
-		if (!resource.exists())
+		if (!resource.exists()) {
 			throw new ApiException(Error.NOT_EXIST_IMAGE);
+		}
 
 		return ResponseEntity.ok()
 			.headers(headers)
 			.body(resource);
 	}
 }
+

@@ -33,7 +33,7 @@ public class ApiExceptionHandler {
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity MethodArgumentNotValidException(HttpServletRequest request,
+	public ResponseEntity methodArgumentNotValidException(HttpServletRequest request,
 		MethodArgumentNotValidException error) {
 		String message = error.getBindingResult()
 			.getFieldErrors()
@@ -49,7 +49,7 @@ public class ApiExceptionHandler {
 	}
 
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-	public ResponseEntity HttpMediaTypeNotSupportedException(HttpServletRequest request,
+	public ResponseEntity httpMediaTypeNotSupportedException(HttpServletRequest request,
 		HttpMediaTypeNotSupportedException error) {
 		log.error("HttpMediaTypeNotSupportedException message({}), type({}), path({} {})", error.getMessage(),
 			error.getContentType(), request.getMethod(), request.getRequestURI());

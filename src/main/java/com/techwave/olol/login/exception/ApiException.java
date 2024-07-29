@@ -5,12 +5,19 @@ import lombok.Data;
 @Data
 public class ApiException extends RuntimeException {
 
-    private int code;
+	private int code;
+	private String message;
 
-    private String message;
+	public ApiException(Error error) {
+		super(error.getMessage());
+		this.code = error.getCode();
+		this.message = error.getMessage();
+	}
 
-    public ApiException(Error error) {
-        this.code = error.getCode();
-        this.message = error.getMessage();
-    }
+	public ApiException(Error error, Throwable cause) {
+		super(error.getMessage(), cause);
+		this.code = error.getCode();
+		this.message = error.getMessage();
+	}
 }
+
