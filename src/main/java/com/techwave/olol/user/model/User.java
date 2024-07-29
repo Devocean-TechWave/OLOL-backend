@@ -32,35 +32,45 @@ public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
+	@Column(name = "id")
 	private String id;
 
+	@Column(name = "name")
 	private String name;
 
-	@Column(unique = true)
+	@Column(name = "nickname", unique = true)
 	private String nickname;
 
+	@Column(name = "password")
 	private String password;
 
+	@Column(name = "profile_url")
 	private String profileUrl;
 
+	@Column(name = "birth")
 	private LocalDate birth;
 
 	@Enumerated(value = EnumType.STRING)
+	@Column(name = "gender")
 	private GenderType gender;
 
 	@Enumerated(value = EnumType.STRING)
+	@Column(name = "auth_type")
 	private AuthType authType; // 일반 유저, kakao 로그인 유저 구분
 
-	@Column(unique = true)
+	@Column(name = "snsid", unique = true)
 	private String snsId; // kakao 로그인 ID
 
 	@Enumerated(value = EnumType.STRING)
+	@Column(name = "status")
 	private UserStatus status;
 
 	@CreatedDate
+	@Column(name = "created_time")
 	private LocalDateTime createdTime;
 
 	@LastModifiedDate
+	@Column(name = "updated_time")
 	private LocalDateTime updatedTime;
 
 	@Builder
