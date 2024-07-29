@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.techwave.olol.login.dto.reponse.ApiResponse;
+import com.techwave.olol.login.dto.reponse.ResponseDto;
 import com.techwave.olol.user.dto.UserDto;
 import com.techwave.olol.user.dto.request.EditUserRequest;
 import com.techwave.olol.user.service.UserService;
@@ -20,6 +20,7 @@ import com.techwave.olol.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +33,7 @@ public class MyPageController {
 
 	@Operation(summary = "내 정보 조회",
 		responses = {
-			@io.swagger.v3.oas.annotations.responses.ApiResponse(
+			@ApiResponse(
 				responseCode = "200",
 				description = "조회 성공",
 				content = @Content(
@@ -43,16 +44,16 @@ public class MyPageController {
 		}
 	)
 	@GetMapping("/info")
-	public ResponseEntity<ApiResponse> getMyInfo(Authentication authentication) {
+	public ResponseEntity<ResponseDto> getMyInfo(Authentication authentication) {
 		UserDetails userDetails = (UserDetails)authentication.getPrincipal();
 		UserDto dto = userService.getUser(userDetails.getUsername());
 
-		return ResponseEntity.ok().body(new ApiResponse(dto));
+		return ResponseEntity.ok().body(new ResponseDto(dto));
 	}
 
 	@Operation(summary = "내 정보 수정",
 		responses = {
-			@io.swagger.v3.oas.annotations.responses.ApiResponse(
+			@ApiResponse(
 				responseCode = "200",
 				description = "수정 성공",
 				content = @Content(
@@ -63,22 +64,22 @@ public class MyPageController {
 		}
 	)
 	@PutMapping("/info/edit")
-	public ResponseEntity<ApiResponse> editUserInfo(Authentication authentication,
+	public ResponseEntity<ResponseDto> editUserInfo(Authentication authentication,
 		@RequestPart(required = false) @Valid EditUserRequest data,
 		@RequestPart(value = "file", required = false) MultipartFile file) {
 		UserDetails userDetails = (UserDetails)authentication.getPrincipal();
 		UserDto dto = userService.edit(userDetails.getUsername(), data, file);
 
-		return ResponseEntity.ok().body(new ApiResponse(dto));
+		return ResponseEntity.ok().body(new ResponseDto(dto));
 	}
 
 	// 탈퇴 처리, 닉네임(유니크)값이기 때문에 저장은 밀리초 포함해서 저장하고 response는 [탈퇴한 유저]만, 프로필 빈문자열 처리
 	@Operation(summary = "회원 탈퇴")
 	@DeleteMapping("/info/delete")
-	public ResponseEntity<ApiResponse> deleteUser(Authentication authentication) {
+	public ResponseEntity<ResponseDto> deleteUser(Authentication authentication) {
 		UserDetails userDetails = (UserDetails)authentication.getPrincipal();
 		userService.delete(userDetails.getUsername());
 
-		return ResponseEntity.ok().body(new ApiResponse(true));
+		return ResponseEntity.ok().body(new ResponseDto(true));
 	}
 }

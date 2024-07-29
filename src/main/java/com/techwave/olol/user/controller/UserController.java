@@ -8,13 +8,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.techwave.olol.login.dto.reponse.ApiResponse;
+import com.techwave.olol.login.dto.reponse.ResponseDto;
 import com.techwave.olol.user.dto.UserDto;
 import com.techwave.olol.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class UserController {
 
 	@Operation(summary = "유저 검색(nickname)",
 		responses = {
-			@io.swagger.v3.oas.annotations.responses.ApiResponse(
+			@ApiResponse(
 				responseCode = "200",
 				description = "유저 검색 성공",
 				content = @Content(
@@ -37,23 +38,23 @@ public class UserController {
 		}
 	)
 	@GetMapping
-	public ResponseEntity<ApiResponse> findByNickname(@RequestParam(value = "nickname") String nickname) {
+	public ResponseEntity<ResponseDto> findByNickname(@RequestParam(value = "nickname") String nickname) {
 		UserDto dto = userService.findByNickname(nickname);
 
-		return ResponseEntity.ok().body(new ApiResponse(dto));
+		return ResponseEntity.ok().body(new ResponseDto(dto));
 	}
 
 	@Operation(summary = "닉네임 중복 체크")
 	@GetMapping("/check-nickname")
-	public ResponseEntity<ApiResponse> checkNickname(@RequestParam(value = "nickname") String nickname) {
+	public ResponseEntity<ResponseDto> checkNickname(@RequestParam(value = "nickname") String nickname) {
 		boolean existsNickname = userService.checkNickname(nickname);
 
-		return ResponseEntity.ok().body(new ApiResponse(existsNickname));
+		return ResponseEntity.ok().body(new ResponseDto(existsNickname));
 	}
 
 	@Operation(summary = "유저 정보 조회",
 		responses = {
-			@io.swagger.v3.oas.annotations.responses.ApiResponse(
+			@ApiResponse(
 				responseCode = "200",
 				description = "조회 성공",
 				content = @Content(
@@ -64,10 +65,10 @@ public class UserController {
 		}
 	)
 	@GetMapping("/info/{id}")
-	public ResponseEntity<ApiResponse> getUser(@PathVariable String id) {
+	public ResponseEntity<ResponseDto> getUser(@PathVariable String id) {
 		UserDto dto = userService.getUser(id);
 
-		return ResponseEntity.ok().body(new ApiResponse(dto));
+		return ResponseEntity.ok().body(new ResponseDto(dto));
 	}
 }
 

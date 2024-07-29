@@ -8,17 +8,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techwave.olol.login.dto.AuthTokenDto;
-import com.techwave.olol.login.dto.reponse.ApiResponse;
+import com.techwave.olol.login.dto.reponse.ResponseDto;
 import com.techwave.olol.login.service.LoginService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RequestMapping("/v1/users/login")
 @RestController
+
 public class LoginController {
 
 	private final LoginService loginService;
@@ -26,7 +28,7 @@ public class LoginController {
 	@Operation(
 		summary = "카카오 로그인",
 		responses = {
-			@io.swagger.v3.oas.annotations.responses.ApiResponse(
+			@ApiResponse(
 				responseCode = "200",
 				description = "카카오 로그인 성공",
 				content = @Content(
@@ -37,10 +39,10 @@ public class LoginController {
 		}
 	)
 	@GetMapping("/kakao")
-	public ResponseEntity<ApiResponse> kakaoLogin(@RequestParam(value = "code") String code) {
+	public ResponseEntity<ResponseDto> kakaoLogin(@RequestParam(value = "code") String code) {
 		AuthTokenDto dto = loginService.kakaoLogin(code);
 
-		return ResponseEntity.ok().body(new ApiResponse(dto));
+		return ResponseEntity.ok().body(new ResponseDto(dto));
 	}
 }
 

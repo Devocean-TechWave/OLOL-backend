@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.techwave.olol.login.dto.reponse.ApiResponse;
+import com.techwave.olol.login.dto.reponse.ResponseDto;
 import com.techwave.olol.user.dto.request.KakaoJoinRequest;
 import com.techwave.olol.user.service.UserService;
 
@@ -25,12 +25,12 @@ public class JoinController {
 
 	@Operation(summary = "카카오 (첫 로그인 = 회원가입 시) 추가 정보")
 	@PostMapping("/kakao")
-	public ResponseEntity<ApiResponse> joinKakao(
+	public ResponseEntity<ResponseDto> joinKakao(
 		Authentication authentication,
 		@RequestBody @Valid KakaoJoinRequest request) {
 		UserDetails userDetails = (UserDetails)authentication.getPrincipal();
 		userService.kakaoJoin(userDetails.getUsername(), request);
 
-		return ResponseEntity.ok().body(new ApiResponse(true));
+		return ResponseEntity.ok().body(new ResponseDto(true));
 	}
 }
