@@ -1,7 +1,5 @@
 package com.techwave.olol.login.auth;
 
-import static com.techwave.olol.login.config.SecurityConfig.*;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -15,6 +13,7 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.techwave.olol.login.config.SecurityProperties;
 import com.techwave.olol.login.util.RequestUtil;
 
 import jakarta.servlet.FilterChain;
@@ -29,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtProvider jwtProvider;
+	private final SecurityProperties securityProperties;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -51,7 +51,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private boolean checkAuthRequired(HttpServletRequest request) {
 		RequestMatcher rm = new NegatedRequestMatcher(new OrRequestMatcher(
-			Arrays.stream(WHITELIST).map(AntPathRequestMatcher::new).collect(Collectors.toList())));
-		return rm.matcher(request).isMatch();
+			Arrays.stream(securityProperties.getWhitelist())
+				.map(AntPathRequestMatcher::new)
+				.collect(Collectors.toList())));
+		return rm.matches(request);
 	}
 }
+

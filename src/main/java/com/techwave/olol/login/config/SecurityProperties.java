@@ -13,3 +13,4 @@ import lombok.Setter;
 public class SecurityProperties {
 	private String[] whitelist;
 }
+

@@ -37,12 +37,11 @@ public class SecurityConfig {
 			.authorizeHttpRequests(authorize -> authorize
 				.requestMatchers(securityProperties.getWhitelist()).permitAll()
 				.anyRequest().authenticated())
-			.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, securityProperties),
+				UsernamePasswordAuthenticationFilter.class)
 			.exceptionHandling(exceptionHandling -> exceptionHandling
 				.accessDeniedHandler(tokenAccessDeniedHandler));
 
 		return http.build();
 	}
 }
-
-

@@ -72,7 +72,7 @@ public class JwtProvider {
 	}
 
 	public Claims validateToken(String token) {
-		Claims claims = jwtUtil.validateToken(token);
+		Claims claims = jwtUtil.validateToken(token, false);
 		if (claims == null)
 			throw new ApiException(Error.TOKEN_VALID_FAILED);
 
@@ -80,7 +80,7 @@ public class JwtProvider {
 	}
 
 	public Claims validateByExpiredToken(String token) {
-		Claims claims = jwtUtil.validateByExpiredToken(token);
+		Claims claims = jwtUtil.validateToken(token, true);
 		if (claims == null)
 			throw new ApiException(Error.TOKEN_VALID_FAILED);
 
