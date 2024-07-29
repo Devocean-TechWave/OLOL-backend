@@ -7,7 +7,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.techwave.olol.user.constant.GenderType;
-import com.techwave.olol.user.constant.UserStatus;
 import com.techwave.olol.user.model.User;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,8 +34,8 @@ public class UserDto {
 	@Schema(example = "MALE")
 	private GenderType gender;
 
-	@Schema(example = "NORMAL")
-	private UserStatus status;
+	@Schema(example = "false")
+	private boolean isDelete;
 
 	@Schema(example = "2024-07-27 17:37:31.633324")
 	private LocalDateTime createdTime;
@@ -50,7 +49,7 @@ public class UserDto {
 
 		String nickname = user.getNickname();
 		// 탈퇴한 유저 닉네임 처리
-		if (user.getStatus() == UserStatus.DELETE)
+		if (user.isDelete())
 			nickname = "[탈퇴한 유저]";
 		this.nickname = nickname;
 
@@ -62,7 +61,7 @@ public class UserDto {
 		this.profileUrl = imageUrl;
 		this.birth = user.getBirth();
 		this.gender = user.getGender();
-		this.status = user.getStatus();
+		this.isDelete = user.isDelete();
 		this.createdTime = user.getCreatedTime();
 		this.updatedTime = user.getUpdatedTime();
 	}

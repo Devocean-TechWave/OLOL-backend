@@ -9,7 +9,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.techwave.olol.login.constant.AuthType;
 import com.techwave.olol.user.constant.GenderType;
-import com.techwave.olol.user.constant.UserStatus;
 import com.techwave.olol.user.dto.request.KakaoJoinRequest;
 
 import jakarta.persistence.Column;
@@ -58,12 +57,11 @@ public class User {
 	@Column(name = "auth_type")
 	private AuthType authType; // 일반 유저, kakao 로그인 유저 구분
 
+	@Column(name = "is_delete")
+	private boolean isDelete;
+
 	@Column(name = "snsid", unique = true)
 	private String snsId; // kakao 로그인 ID
-
-	@Enumerated(value = EnumType.STRING)
-	@Column(name = "status")
-	private UserStatus status;
 
 	@CreatedDate
 	@Column(name = "created_time")
@@ -78,7 +76,7 @@ public class User {
 		this.profileUrl = "default_profile.PNG";
 		this.authType = authType;
 		this.snsId = snsId;
-		this.status = UserStatus.NORMAL;
+		this.isDelete = false;
 	}
 
 	public void setNickname(String nickname) {
@@ -99,7 +97,7 @@ public class User {
 	public void delete() {
 		this.nickname = "[탈퇴한 유저] " + System.currentTimeMillis();
 		this.profileUrl = "";
-		this.status = UserStatus.DELETE;
+		this.isDelete = true;
 		this.snsId = null; // kakao 재가입 가능 처리
 	}
 }
