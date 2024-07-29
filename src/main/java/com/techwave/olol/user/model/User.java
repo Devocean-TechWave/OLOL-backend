@@ -1,12 +1,10 @@
 package com.techwave.olol.user.model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.techwave.olol.common.BaseEntity;
 import com.techwave.olol.login.constant.AuthType;
 import com.techwave.olol.user.constant.GenderType;
 import com.techwave.olol.user.dto.request.KakaoJoinRequest;
@@ -27,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Entity
-public class User {
+public class User extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -62,14 +60,6 @@ public class User {
 
 	@Column(name = "snsid", unique = true)
 	private String snsId; // kakao 로그인 ID
-
-	@CreatedDate
-	@Column(name = "created_time")
-	private LocalDateTime createdTime;
-
-	@LastModifiedDate
-	@Column(name = "updated_time")
-	private LocalDateTime updatedTime;
 
 	@Builder
 	public User(AuthType authType, String snsId) {
