@@ -23,7 +23,7 @@ public class JoinController {
 
 	private final UserService userService;
 
-	@Operation(summary = "카카오 (첫 로그인 = 회원가입 시) 추가 정보")
+	@Operation(summary = "카카오 (첫 로그인 = 회원가입 시) 추가정보")
 	@PostMapping("/kakao")
 	public ResponseEntity<ResponseDto> joinKakao(
 		Authentication authentication,
