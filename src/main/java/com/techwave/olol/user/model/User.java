@@ -88,6 +88,6 @@ public class User extends BaseEntity {
 		this.nickname = "[탈퇴한 유저] " + System.currentTimeMillis();
 		this.profileUrl = "";
 		this.isDelete = true;
-		this.snsId = null; // kakao 재가입 가능 처리
+		this.snsId = null; // kakao 재가입 가능 처리.
 	}
 }

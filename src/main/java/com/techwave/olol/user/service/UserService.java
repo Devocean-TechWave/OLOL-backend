@@ -93,7 +93,7 @@ public class UserService {
 
 		refreshTokenRepository.deleteById(user.getId());
 
-		// 탈퇴한 유저 accessToken 접근 막는건 추가 개발 필요.
+		// 탈퇴한 유저 accessToken 접근 막는건 추가 개발 필요
 
 		userRepository.save(user);
 	}
