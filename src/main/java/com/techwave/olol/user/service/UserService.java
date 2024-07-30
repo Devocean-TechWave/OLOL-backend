@@ -15,6 +15,7 @@ import com.techwave.olol.login.exception.Error;
 import com.techwave.olol.login.repository.RefreshTokenRepository;
 import com.techwave.olol.user.dto.UserDto;
 import com.techwave.olol.user.dto.request.EditUserRequest;
+import com.techwave.olol.user.dto.request.KakaoJoinRequest;
 import com.techwave.olol.user.model.User;
 import com.techwave.olol.user.repository.UserRepository;
 

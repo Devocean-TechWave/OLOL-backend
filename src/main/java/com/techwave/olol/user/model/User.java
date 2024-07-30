@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.techwave.olol.common.BaseEntity;
 import com.techwave.olol.login.constant.AuthType;
 import com.techwave.olol.user.constant.GenderType;
+import com.techwave.olol.user.dto.request.KakaoJoinRequest;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
