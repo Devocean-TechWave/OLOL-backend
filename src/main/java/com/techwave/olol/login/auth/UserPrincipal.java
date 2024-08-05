@@ -1,4 +1,4 @@
-package com.techwave.olol.user.model;
+package com.techwave.olol.login.auth;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -7,6 +7,8 @@ import java.util.Map;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.techwave.olol.user.model.User;
 
 import lombok.Builder;
 import lombok.Data;
