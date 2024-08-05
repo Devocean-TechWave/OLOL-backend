@@ -56,9 +56,9 @@ public class User extends BaseEntity {
 	private AuthType authType; // 일반 유저, kakao 로그인 유저 구분
 
 	@Column(name = "is_delete")
-	private boolean isDelete;
+	private Boolean isDelete;
 
-	@Column(name = "snsid", unique = true)
+	@Column(name = "sns_id", unique = true)
 	private String snsId; // kakao 로그인 ID
 
 	@Builder
@@ -67,6 +67,10 @@ public class User extends BaseEntity {
 		this.authType = authType;
 		this.snsId = snsId;
 		this.isDelete = false;
+	}
+
+	public boolean isDelete() {
+		return isDelete;
 	}
 
 	public void setNickname(String nickname) {
@@ -84,10 +88,8 @@ public class User extends BaseEntity {
 		this.gender = GenderType.MALE.getName().equals(request.getGender()) ? GenderType.MALE : GenderType.FEMALE;
 	}
 
-	public void delete() {
-		this.nickname = "[탈퇴한 유저] " + System.currentTimeMillis();
-		this.profileUrl = "";
-		this.isDelete = true;
-		this.snsId = null; // kakao 재가입 가능 처리.
+	public void setIsDelete(boolean isDelete) {
+		this.isDelete = isDelete;
 	}
+
 }
