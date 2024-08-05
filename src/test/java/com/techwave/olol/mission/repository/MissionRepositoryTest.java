@@ -9,16 +9,34 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.techwave.olol.mission.domain.Mission;
 
+import jakarta.annotation.PostConstruct;
+
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @ActiveProfiles("test")
 class MissionRepositoryTest {
+
+	@TestConfiguration
+	static class TestConfig {
+
+		@PostConstruct
+		void setUpLogging() {
+			System.setProperty("org.jboss.logging.provider", "slf4j");
+		}
+
+		@Bean
+		public org.slf4j.Logger logger() {
+			return org.slf4j.LoggerFactory.getLogger("org.hibernate.SQL");
+		}
+	}
 
 	@Autowired
 	private MissionRepository missionRepository;
@@ -62,7 +80,8 @@ class MissionRepositoryTest {
 
 		// when
 		missionRepository.delete(savedMission);
-
+		//isDelete 제대로 적용됐는지 로그 보려면 주석 해제
+		// missionRepository.findAll().forEach(System.out::println);
 		// then
 		assertThat(missionRepository.findById(savedMission.getId())).isEmpty();
 	}

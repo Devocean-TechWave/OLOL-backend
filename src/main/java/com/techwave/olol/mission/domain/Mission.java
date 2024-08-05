@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.techwave.olol.user.domain.User;
 
@@ -30,6 +32,8 @@ import lombok.Setter;
 @Table(name = "mission")
 @Entity
 @Getter
+@SQLRestriction("is_delete = false")
+@SQLDelete(sql = "UPDATE Mission SET is_delete = true WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Mission {
 	@Id
@@ -63,6 +67,10 @@ public class Mission {
 	@Column(name = "is_image_required", nullable = false)
 	@ColumnDefault("false")
 	private boolean isImageRequired;
+
+	@Column(name = "is_delete", nullable = false)
+	@ColumnDefault("false")
+	private boolean isDeleted;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "giver_id")

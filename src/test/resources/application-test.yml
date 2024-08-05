@@ -9,7 +9,9 @@ spring:
     show-sql: 'true'
     hibernate:
       ddl-auto: create
-
+    properties:
+      hibernate:
+        format_sql: 'true'
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -39,3 +41,11 @@ aws:
     static: TEST_REGION
   stack:
     auto: false
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql: TRACE
