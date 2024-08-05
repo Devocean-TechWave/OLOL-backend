@@ -1,6 +1,7 @@
 package com.techwave.olol.mission.domain;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Table(name = "mission")
 @Entity
@@ -55,6 +57,7 @@ public class Mission {
 
 	@Column(name = "is_success", nullable = false)
 	@ColumnDefault("false")
+	@Setter
 	private boolean isSuccess;
 
 	@Column(name = "is_image_required", nullable = false)
@@ -70,7 +73,7 @@ public class Mission {
 	private User receiver;
 
 	@OneToMany(mappedBy = "mission")
-	private List<SuccessStamp> successStamps;
+	private List<SuccessStamp> successStamps = new ArrayList<>();
 
 	@Builder
 	public Mission(LocalDate startAt, LocalDate endAt, String name, String emoji, String reward, int successQuota,
@@ -83,6 +86,20 @@ public class Mission {
 		this.successQuota = successQuota;
 		this.isSuccess = isSuccess;
 		this.isImageRequired = isImageRequired;
+	}
+
+	public void setGiver(User giver) {
+		this.giver = giver;
+		giver.getGivenMissions().add(this);
+	}
+
+	public void setReceiver(User receiver) {
+		this.receiver = receiver;
+		receiver.getReceivedMissions().add(this);
+	}
+
+	public void addSuccessStamp(SuccessStamp successStamp) {
+		this.successStamps.add(successStamp);
 	}
 
 	@PrePersist
