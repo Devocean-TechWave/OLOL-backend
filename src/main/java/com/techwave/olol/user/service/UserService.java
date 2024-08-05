@@ -4,14 +4,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.techwave.olol.global.exception.ApiException;
 import com.techwave.olol.login.constant.AuthType;
-import com.techwave.olol.login.exception.ApiException;
-import com.techwave.olol.login.exception.Error;
+import com.techwave.olol.global.exception.Error;
 import com.techwave.olol.login.repository.RefreshTokenRepository;
 import com.techwave.olol.user.dto.UserDto;
 import com.techwave.olol.user.dto.request.EditUserRequest;
@@ -33,19 +34,17 @@ public class UserService {
 
 	public UserDto getUser(String id) {
 		User user = findById(id);
-
 		return new UserDto(user);
 	}
 
 	public UserDto findByNickname(String nickname) {
-		User user = userRepository.findByNickname(nickname);
-
-		return user != null ? new UserDto(user) : null;
+		Optional<User> userOpt = userRepository.findByNickname(nickname);
+		return userOpt.map(UserDto::new).orElse(null);
 	}
 
 	public boolean checkNickname(String nickname) {
-		User user = userRepository.findByNickname(nickname);
-		return user == null;
+		Optional<User> userOpt = userRepository.findByNickname(nickname);
+		return userOpt.isEmpty();
 	}
 
 	@Transactional
@@ -82,19 +81,14 @@ public class UserService {
 		}
 
 		user = userRepository.save(user);
-
 		return new UserDto(user);
 	}
 
 	@Transactional
 	public void delete(String id) {
 		User user = userRepository.findById(id).orElseThrow(() -> new ApiException(Error.NOT_EXIST_USER));
-		user.delete();
-
+		user.setIsDelete(true);  // 유저 삭제 상태로 설정
 		refreshTokenRepository.deleteById(user.getId());
-
-		// 탈퇴한 유저 accessToken 접근 막는건 추가 개발 필요
-
 		userRepository.save(user);
 	}
 
