@@ -1,4 +1,4 @@
-package com.techwave.olol.login.model;
+package com.techwave.olol.login.domain;
 
 import java.time.LocalDateTime;
 
@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
 @Getter
@@ -16,8 +17,10 @@ public class RefreshToken {
 	@Id
 	private String userId;
 
+	@Setter
 	private String refreshToken;
 
+	@Setter
 	private LocalDateTime expiration;
 
 	@Builder
@@ -26,12 +29,5 @@ public class RefreshToken {
 		this.refreshToken = refreshToken;
 		this.expiration = expiration;
 	}
-
-	public void setRefreshToken(String refreshToken) {
-		this.refreshToken = refreshToken;
-	}
-
-	public void setExpiration(LocalDateTime expiration) {
-		this.expiration = expiration;
-	}
 }
+
