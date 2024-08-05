@@ -35,7 +35,7 @@ public class UserDto {
 	private GenderType gender;
 
 	@Schema(example = "false")
-	private boolean isDelete;
+	private Boolean isDelete;
 
 	@Schema(example = "2024-07-27 17:37:31.633324")
 	private LocalDateTime createdTime;

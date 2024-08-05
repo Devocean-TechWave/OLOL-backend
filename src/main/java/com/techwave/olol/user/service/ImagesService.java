@@ -10,8 +10,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.techwave.olol.login.exception.ApiException;
-import com.techwave.olol.login.exception.Error;
+import com.techwave.olol.global.exception.ApiException;
+import com.techwave.olol.global.exception.Error;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
