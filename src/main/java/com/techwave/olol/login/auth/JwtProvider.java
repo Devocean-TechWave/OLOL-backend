@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,9 +12,10 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.techwave.olol.global.exception.ApiException;
+import com.techwave.olol.global.exception.Error;
+import com.techwave.olol.login.config.JwtProperties;
 import com.techwave.olol.login.dto.TokenDto;
-import com.techwave.olol.login.exception.ApiException;
-import com.techwave.olol.login.exception.Error;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -27,23 +27,18 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtProvider {
 
 	private final JwtUtil jwtUtil;
-
-	@Value("${jwt.accessToken.duration}")
-	public Long jwtAccessTokenDuration;
-
-	@Value("${jwt.refreshToken.duration}")
-	public Long jwtRefreshTokenDuration;
+	private final JwtProperties jwtProperties;
 
 	public TokenDto generateToken(String id) {
 		Date now = new Date();
-		Date expiration = new Date(System.currentTimeMillis() + jwtAccessTokenDuration);
+		Date expiration = new Date(System.currentTimeMillis() + jwtProperties.getAccessTokenDuration());
 
 		return jwtUtil.generateToken(id, now, expiration);
 	}
 
 	public TokenDto generateRefreshToken() {
 		Date now = new Date();
-		Date expiration = new Date(System.currentTimeMillis() + jwtRefreshTokenDuration);
+		Date expiration = new Date(System.currentTimeMillis() + jwtProperties.getRefreshTokenDuration());
 
 		return jwtUtil.generateToken(null, now, expiration);
 	}
