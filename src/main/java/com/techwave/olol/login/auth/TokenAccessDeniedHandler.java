@@ -6,8 +6,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import com.techwave.olol.login.exception.ApiException;
-import com.techwave.olol.login.exception.Error;
+import com.techwave.olol.global.exception.ApiException;
+import com.techwave.olol.global.exception.Error;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
