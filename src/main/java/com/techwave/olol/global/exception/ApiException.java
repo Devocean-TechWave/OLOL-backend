@@ -1,8 +1,12 @@
-package com.techwave.olol.login.exception;
+package com.techwave.olol.global.exception;
+
+import com.techwave.olol.global.exception.Error;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class ApiException extends RuntimeException {
 
 	private int code;
@@ -20,4 +24,3 @@ public class ApiException extends RuntimeException {
 		this.message = error.getMessage();
 	}
 }
-

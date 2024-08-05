@@ -1,4 +1,4 @@
-package com.techwave.olol.login.exception;
+package com.techwave.olol.global.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
