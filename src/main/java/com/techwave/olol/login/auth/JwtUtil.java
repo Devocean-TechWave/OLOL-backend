@@ -53,7 +53,7 @@ public class JwtUtil implements InitializingBean {
 			.build();
 	}
 
-	public Claims validateToken(String token, boolean allowExpired) {
+	public Claims validateToken(String token, Boolean allowExpired) {
 		try {
 			return Jwts.parser().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
 		} catch (SecurityException | MalformedJwtException e) {
@@ -74,3 +74,4 @@ public class JwtUtil implements InitializingBean {
 		return null;
 	}
 }
+
