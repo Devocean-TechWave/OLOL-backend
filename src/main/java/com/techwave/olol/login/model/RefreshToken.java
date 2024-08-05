@@ -7,10 +7,8 @@ import jakarta.persistence.Id;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @NoArgsConstructor
-@Setter
 @Getter
 @Entity
 public class RefreshToken {
@@ -26,6 +24,14 @@ public class RefreshToken {
 	public RefreshToken(String userId, String refreshToken, LocalDateTime expiration) {
 		this.userId = userId;
 		this.refreshToken = refreshToken;
+		this.expiration = expiration;
+	}
+
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
+
+	public void setExpiration(LocalDateTime expiration) {
 		this.expiration = expiration;
 	}
 }

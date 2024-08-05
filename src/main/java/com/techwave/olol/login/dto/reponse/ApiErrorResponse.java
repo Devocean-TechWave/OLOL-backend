@@ -1,7 +1,7 @@
 package com.techwave.olol.login.dto.reponse;
 
-import com.techwave.olol.login.exception.ApiException;
-import com.techwave.olol.login.exception.Error;
+import com.techwave.olol.global.exception.ApiException;
+import com.techwave.olol.global.exception.Error;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
