@@ -43,5 +43,4 @@ public class Cheer {
 	public Cheer(CheerType cheerType) {
 		this.cheerType = cheerType;
 	}
-	
 }

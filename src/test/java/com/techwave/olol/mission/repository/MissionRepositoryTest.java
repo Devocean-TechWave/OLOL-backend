@@ -84,5 +84,4 @@ class MissionRepositoryTest {
 			.isInstanceOf(InvalidDataAccessApiUsageException.class)
 			.hasMessageContaining("Start date must be before end date");
 	}
-
 }

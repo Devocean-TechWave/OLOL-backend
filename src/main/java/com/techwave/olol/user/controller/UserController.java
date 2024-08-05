@@ -28,7 +28,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RequestMapping("/v1/users")
+@RequestMapping("/api/v1/users")
 @RestController
 public class UserController {
 
@@ -111,6 +111,7 @@ public class UserController {
 	)
 	@GetMapping("/login/kakao")
 	public ResponseEntity<AuthTokenDto> kakaoLogin(@RequestParam(value = "code") String code) {
+		System.out.println("code = " + code);
 		AuthTokenDto dto = loginService.kakaoLogin(code);
 		return ResponseEntity.ok(dto);
 	}
