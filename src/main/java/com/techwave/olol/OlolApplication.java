@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import com.techwave.olol.login.config.SecurityProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties(SecurityProperties.class)
+@EnableConfigurationProperties({JwtProperties.class, SecurityProperties.class})
 public class OlolApplication {
 
 	public static void main(String[] args) {
