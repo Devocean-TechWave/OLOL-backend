@@ -1,7 +1,5 @@
 package com.techwave.olol.global.exception;
 
-import com.techwave.olol.global.exception.Error;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

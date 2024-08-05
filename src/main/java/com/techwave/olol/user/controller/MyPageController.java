@@ -31,16 +31,17 @@ public class MyPageController {
 	private final UserService userService;
 
 	@Operation(summary = "내 정보 조회",
-		responses = {
-			@ApiResponse(
-				responseCode = "200",
-				description = "조회 성공",
-				content = @Content(
-					mediaType = MediaType.APPLICATION_JSON_VALUE,
-					schema = @Schema(implementation = UserDto.class)
+		responses =
+			{
+				@ApiResponse(
+					responseCode = "200",
+					description = "조회 성공",
+					content = @Content(
+						mediaType = MediaType.APPLICATION_JSON_VALUE,
+						schema = @Schema(implementation = UserDto.class)
+					)
 				)
-			)
-		}
+			}
 	)
 	@GetMapping("/info")
 	public ResponseEntity<UserDto> getMyInfo(Authentication authentication) {
@@ -50,16 +51,17 @@ public class MyPageController {
 	}
 
 	@Operation(summary = "내 정보 수정",
-		responses = {
-			@ApiResponse(
-				responseCode = "200",
-				description = "수정 성공",
-				content = @Content(
-					mediaType = MediaType.APPLICATION_JSON_VALUE,
-					schema = @Schema(implementation = UserDto.class)
+		responses =
+			{
+				@ApiResponse(
+					responseCode = "200",
+					description = "수정 성공",
+					content = @Content(
+						mediaType = MediaType.APPLICATION_JSON_VALUE,
+						schema = @Schema(implementation = UserDto.class)
+					)
 				)
-			)
-		}
+			}
 	)
 	@PutMapping("/info/edit")
 	public ResponseEntity<UserDto> editUserInfo(Authentication authentication,
@@ -71,16 +73,17 @@ public class MyPageController {
 	}
 
 	@Operation(summary = "회원 탈퇴",
-		responses = {
-			@ApiResponse(
-				responseCode = "200",
-				description = "탈퇴 성공",
-				content = @Content(
-					mediaType = MediaType.APPLICATION_JSON_VALUE,
-					schema = @Schema(implementation = Boolean.class)
+		responses =
+			{
+				@ApiResponse(
+					responseCode = "200",
+					description = "탈퇴 성공",
+					content = @Content(
+						mediaType = MediaType.APPLICATION_JSON_VALUE,
+						schema = @Schema(implementation = Boolean.class)
+					)
 				)
-			)
-		}
+			}
 	)
 	@DeleteMapping("/info/delete")
 	public ResponseEntity<Boolean> deleteUser(Authentication authentication) {
