@@ -52,4 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			Arrays.stream(WHITELIST).map(AntPathRequestMatcher::new).collect(Collectors.toList())));
 		return rm.matcher(request).isMatch();
 	}
+
+	//
 }
