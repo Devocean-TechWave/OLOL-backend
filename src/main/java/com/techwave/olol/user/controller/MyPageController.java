@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.techwave.olol.login.dto.reponse.ResponseDto;
 import com.techwave.olol.user.dto.UserDto;
 import com.techwave.olol.user.dto.request.EditUserRequest;
 import com.techwave.olol.user.service.UserService;
@@ -44,11 +43,10 @@ public class MyPageController {
 		}
 	)
 	@GetMapping("/info")
-	public ResponseEntity<ResponseDto> getMyInfo(Authentication authentication) {
+	public ResponseEntity<UserDto> getMyInfo(Authentication authentication) {
 		UserDetails userDetails = (UserDetails)authentication.getPrincipal();
 		UserDto dto = userService.getUser(userDetails.getUsername());
-
-		return ResponseEntity.ok().body(new ResponseDto(dto));
+		return ResponseEntity.ok(dto);
 	}
 
 	@Operation(summary = "내 정보 수정",
@@ -64,22 +62,31 @@ public class MyPageController {
 		}
 	)
 	@PutMapping("/info/edit")
-	public ResponseEntity<ResponseDto> editUserInfo(Authentication authentication,
+	public ResponseEntity<UserDto> editUserInfo(Authentication authentication,
 		@RequestPart(required = false) @Valid EditUserRequest data,
 		@RequestPart(value = "file", required = false) MultipartFile file) {
 		UserDetails userDetails = (UserDetails)authentication.getPrincipal();
 		UserDto dto = userService.edit(userDetails.getUsername(), data, file);
-
-		return ResponseEntity.ok().body(new ResponseDto(dto));
+		return ResponseEntity.ok(dto);
 	}
 
-	// 탈퇴 처리, 닉네임(유니크)값이기 때문에 저장은 밀리초 포함해서 저장하고 response는 [탈퇴한 유저]만, 프로필 빈문자열 처리
-	@Operation(summary = "회원 탈퇴")
+	@Operation(summary = "회원 탈퇴",
+		responses = {
+			@ApiResponse(
+				responseCode = "200",
+				description = "탈퇴 성공",
+				content = @Content(
+					mediaType = MediaType.APPLICATION_JSON_VALUE,
+					schema = @Schema(implementation = Boolean.class)
+				)
+			)
+		}
+	)
 	@DeleteMapping("/info/delete")
-	public ResponseEntity<ResponseDto> deleteUser(Authentication authentication) {
+	public ResponseEntity<Boolean> deleteUser(Authentication authentication) {
 		UserDetails userDetails = (UserDetails)authentication.getPrincipal();
 		userService.delete(userDetails.getUsername());
-
-		return ResponseEntity.ok().body(new ResponseDto(true));
+		return ResponseEntity.ok(true);
 	}
 }
+
