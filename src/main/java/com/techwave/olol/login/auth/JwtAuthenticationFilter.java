@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static com.techwave.olol.login.config.SecurityConfig.WHITELIST;
+import static com.techwave.olol.login.config.SecurityConfig.*;
 
 @Slf4j
 @RequiredArgsConstructor
