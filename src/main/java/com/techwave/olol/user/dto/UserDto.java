@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.techwave.olol.user.constant.GenderType;
-import com.techwave.olol.user.model.User;
+import com.techwave.olol.user.domain.GenderType;
+import com.techwave.olol.user.domain.User;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

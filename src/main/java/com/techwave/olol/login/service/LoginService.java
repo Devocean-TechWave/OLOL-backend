@@ -20,7 +20,7 @@ import com.techwave.olol.login.dto.reponse.KakaoAuthResponse;
 import com.techwave.olol.login.dto.reponse.KakaoUserInfoResponse;
 import com.techwave.olol.login.model.RefreshToken;
 import com.techwave.olol.login.repository.RefreshTokenRepository;
-import com.techwave.olol.user.model.User;
+import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;

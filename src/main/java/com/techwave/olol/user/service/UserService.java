@@ -14,10 +14,10 @@ import com.techwave.olol.global.exception.ApiException;
 import com.techwave.olol.global.exception.Error;
 import com.techwave.olol.login.constant.AuthType;
 import com.techwave.olol.login.repository.RefreshTokenRepository;
+import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.dto.UserDto;
 import com.techwave.olol.user.dto.request.EditUserRequest;
 import com.techwave.olol.user.dto.request.KakaoJoinRequest;
-import com.techwave.olol.user.model.User;
 import com.techwave.olol.user.repository.UserRepository;
 
 import jakarta.transaction.Transactional;

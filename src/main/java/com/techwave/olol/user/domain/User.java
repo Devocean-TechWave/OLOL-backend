@@ -1,4 +1,4 @@
-package com.techwave.olol.user.model;
+package com.techwave.olol.user.domain;
 
 import java.time.LocalDate;
 
@@ -6,7 +6,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.techwave.olol.common.BaseEntity;
 import com.techwave.olol.login.constant.AuthType;
-import com.techwave.olol.user.constant.GenderType;
 import com.techwave.olol.user.dto.request.KakaoJoinRequest;
 
 import jakarta.persistence.Column;
