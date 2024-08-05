@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import com.techwave.olol.login.constant.AuthType;
 import com.techwave.olol.relation.domain.RelationType;
@@ -17,7 +16,6 @@ import com.techwave.olol.user.dto.request.KakaoJoinRequest;
 import com.techwave.olol.user.repository.UserRepository;
 
 @DataJpaTest
-@ActiveProfiles("test")
 class UserRelationShipRepositoryTest {
 	@Autowired
 	private UserRelationShipRepository userRelationShipRepository;

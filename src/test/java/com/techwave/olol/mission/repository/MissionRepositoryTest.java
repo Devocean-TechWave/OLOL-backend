@@ -12,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.techwave.olol.mission.domain.Mission;
@@ -21,7 +20,6 @@ import jakarta.annotation.PostConstruct;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
-@ActiveProfiles("test")
 class MissionRepositoryTest {
 
 	@TestConfiguration
