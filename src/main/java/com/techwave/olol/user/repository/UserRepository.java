@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.techwave.olol.user.model.User;
+import com.techwave.olol.user.domain.User;
 
 public interface UserRepository extends JpaRepository<User, String> {
 

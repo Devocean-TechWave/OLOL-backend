@@ -1,4 +1,4 @@
-package com.techwave.olol.common;
+package com.techwave.olol.global.jpa;
 
 import java.time.LocalDateTime;
 

@@ -10,17 +10,17 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.techwave.olol.global.exception.ApiException;
+import com.techwave.olol.global.exception.Error;
 import com.techwave.olol.login.auth.JwtProvider;
 import com.techwave.olol.login.config.KakaoProperties;
 import com.techwave.olol.login.constant.AuthType;
+import com.techwave.olol.login.domain.RefreshToken;
 import com.techwave.olol.login.dto.AuthTokenDto;
 import com.techwave.olol.login.dto.TokenDto;
 import com.techwave.olol.login.dto.reponse.KakaoAuthResponse;
 import com.techwave.olol.login.dto.reponse.KakaoUserInfoResponse;
-import com.techwave.olol.global.exception.Error;
-import com.techwave.olol.login.model.RefreshToken;
 import com.techwave.olol.login.repository.RefreshTokenRepository;
-import com.techwave.olol.user.model.User;
+import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -104,7 +104,6 @@ public class LoginService {
 			.bodyToMono(KakaoUserInfoResponse.class)
 			.block();
 	}
-
 
 	private MultiValueMap<String, String> authRequest(String code) {
 		MultiValueMap<String, String> authRequest = new LinkedMultiValueMap<>();

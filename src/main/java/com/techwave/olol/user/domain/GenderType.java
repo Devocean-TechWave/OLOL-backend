@@ -1,4 +1,4 @@
-package com.techwave.olol.user.constant;
+package com.techwave.olol.user.domain;
 
 import lombok.Getter;
 

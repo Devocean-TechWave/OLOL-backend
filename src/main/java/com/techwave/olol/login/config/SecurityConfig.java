@@ -27,8 +27,8 @@ public class SecurityConfig {
 	private final JwtProvider jwtProvider;
 
 	public static final String[] WHITELIST = {
-		"/v1/users/login/**",
-		"/v1/users/check-nickname",
+		"/api/v1/users/login/**",
+		"/api/v1/users/check-nickname",
 		"/images/**",
 		"/swagger-ui/**",
 		"/v3/api-docs/**",
@@ -47,7 +47,6 @@ public class SecurityConfig {
 				.requestMatchers(WHITELIST).permitAll()
 				.anyRequest().authenticated())
 			.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
-
 		return http.build();
 	}
 }

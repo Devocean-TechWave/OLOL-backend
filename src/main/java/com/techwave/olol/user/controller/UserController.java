@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techwave.olol.login.dto.AuthTokenDto;
+import com.techwave.olol.login.service.LoginService;
 import com.techwave.olol.user.dto.UserDto;
 import com.techwave.olol.user.dto.request.KakaoJoinRequest;
 import com.techwave.olol.user.service.ImagesService;
 import com.techwave.olol.user.service.UserService;
-import com.techwave.olol.login.service.LoginService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,7 +28,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RequestMapping("/v1/users")
+@RequestMapping("/api/v1/users")
 @RestController
 public class UserController {
 
@@ -38,16 +38,17 @@ public class UserController {
 
 	// 유저 검색 및 닉네임 중복 체크
 	@Operation(summary = "유저 검색(nickname)",
-		responses = {
-			@ApiResponse(
-				responseCode = "200",
-				description = "유저 검색 성공",
-				content = @Content(
-					mediaType = MediaType.APPLICATION_JSON_VALUE,
-					schema = @Schema(implementation = UserDto.class)
+		responses =
+			{
+				@ApiResponse(
+					responseCode = "200",
+					description = "유저 검색 성공",
+					content = @Content(
+						mediaType = MediaType.APPLICATION_JSON_VALUE,
+						schema = @Schema(implementation = UserDto.class)
+					)
 				)
-			)
-		}
+			}
 	)
 	@GetMapping
 	public ResponseEntity<UserDto> findByNickname(@RequestParam(value = "nickname") String nickname) {
@@ -56,16 +57,17 @@ public class UserController {
 	}
 
 	@Operation(summary = "닉네임 중복 체크",
-		responses = {
-			@ApiResponse(
-				responseCode = "200",
-				description = "닉네임 중복 체크 성공",
-				content = @Content(
-					mediaType = MediaType.APPLICATION_JSON_VALUE,
-					schema = @Schema(implementation = Boolean.class)
+		responses =
+			{
+				@ApiResponse(
+					responseCode = "200",
+					description = "닉네임 중복 체크 성공",
+					content = @Content(
+						mediaType = MediaType.APPLICATION_JSON_VALUE,
+						schema = @Schema(implementation = Boolean.class)
+					)
 				)
-			)
-		}
+			}
 	)
 	@GetMapping("/check-nickname")
 	public ResponseEntity<Boolean> checkNickname(@RequestParam(value = "nickname") String nickname) {
@@ -74,16 +76,17 @@ public class UserController {
 	}
 
 	@Operation(summary = "유저 정보 조회",
-		responses = {
-			@ApiResponse(
-				responseCode = "200",
-				description = "조회 성공",
-				content = @Content(
-					mediaType = MediaType.APPLICATION_JSON_VALUE,
-					schema = @Schema(implementation = UserDto.class)
+		responses =
+			{
+				@ApiResponse(
+					responseCode = "200",
+					description = "조회 성공",
+					content = @Content(
+						mediaType = MediaType.APPLICATION_JSON_VALUE,
+						schema = @Schema(implementation = UserDto.class)
+					)
 				)
-			)
-		}
+			}
 	)
 	@GetMapping("/info/{id}")
 	public ResponseEntity<UserDto> getUser(@PathVariable String id) {
@@ -91,46 +94,47 @@ public class UserController {
 		return ResponseEntity.ok(dto);
 	}
 
-
 	// 카카오 로그인
 	@Operation(
 		summary = "카카오 로그인",
-		responses = {
-			@ApiResponse(
-				responseCode = "200",
-				description = "카카오 로그인 성공",
-				content = @Content(
-					mediaType = MediaType.APPLICATION_JSON_VALUE,
-					schema = @Schema(implementation = AuthTokenDto.class)
+		responses =
+			{
+				@ApiResponse(
+					responseCode = "200",
+					description = "카카오 로그인 성공",
+					content = @Content(
+						mediaType = MediaType.APPLICATION_JSON_VALUE,
+						schema = @Schema(implementation = AuthTokenDto.class)
+					)
 				)
-			)
-		}
+			}
 	)
 	@GetMapping("/login/kakao")
 	public ResponseEntity<AuthTokenDto> kakaoLogin(@RequestParam(value = "code") String code) {
+		System.out.println("code = " + code);
 		AuthTokenDto dto = loginService.kakaoLogin(code);
 		return ResponseEntity.ok(dto);
 	}
 
-
 	// 카카오 회원가입
 	@Operation(summary = "카카오 (첫 로그인 = 회원가입 시) 추가 정보",
-		responses = {
-			@ApiResponse(
-				responseCode = "200",
-				description = "회원가입 성공",
-				content = @Content(
-					mediaType = MediaType.APPLICATION_JSON_VALUE,
-					schema = @Schema(implementation = Boolean.class)
+		responses =
+			{
+				@ApiResponse(
+					responseCode = "200",
+					description = "회원가입 성공",
+					content = @Content(
+						mediaType = MediaType.APPLICATION_JSON_VALUE,
+						schema = @Schema(implementation = Boolean.class)
+					)
 				)
-			)
-		}
+			}
 	)
 	@PostMapping("/join/kakao")
 	public ResponseEntity<Boolean> joinKakao(
 		Authentication authentication,
 		@RequestBody @Valid KakaoJoinRequest request) {
-		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+		UserDetails userDetails = (UserDetails)authentication.getPrincipal();
 		userService.kakaoJoin(userDetails.getUsername(), request);
 		return ResponseEntity.ok(true);
 	}

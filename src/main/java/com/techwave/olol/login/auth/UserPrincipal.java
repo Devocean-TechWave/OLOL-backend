@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.techwave.olol.user.model.User;
+import com.techwave.olol.user.domain.User;
 
 import lombok.Builder;
 import lombok.Data;
