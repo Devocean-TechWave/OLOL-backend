@@ -25,16 +25,7 @@ public class SecurityConfig {
 
 	private final TokenAccessDeniedHandler tokenAccessDeniedHandler;
 	private final JwtProvider jwtProvider;
-
-	public static final String[] WHITELIST = {
-		"/api/v1/users/login/**",
-		"/api/v1/users/check-nickname",
-		"/images/**",
-		"/swagger-ui/**",
-		"/v3/api-docs/**",
-		"/error",
-		"/test/**"
-	};
+	private final SecurityProperties securityProperties;
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -43,10 +34,10 @@ public class SecurityConfig {
 			.cors(Customizer.withDefaults())
 			.formLogin(FormLoginConfigurer::disable)
 			.sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers(WHITELIST).permitAll()
-				.anyRequest().authenticated())
-			.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class);
+			.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+			.addFilterBefore(
+				new JwtAuthenticationFilter(securityProperties.getWhitelist(), jwtProvider),
+				UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
 }
