@@ -76,12 +76,6 @@ public class User extends BaseEntity {
 	@OneToMany(mappedBy = "cheerGiver", orphanRemoval = true)
 	private List<Cheer> cheers;
 
-	@OneToMany(mappedBy = "giver", orphanRemoval = true)
-	private List<Mission> givenMissions;
-
-	@OneToMany(mappedBy = "receiver")
-	private List<Mission> receivedMissions;
-
 	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<UserRelationShip> sentRequests = new HashSet<>();
 

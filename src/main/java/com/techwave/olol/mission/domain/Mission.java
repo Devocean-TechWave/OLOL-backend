@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.techwave.olol.mission.dto.request.ReqMissionDto;
+
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -24,17 +26,22 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Table(name = "mission")
 @Entity
-@Getter
+@Slf4j
 @SQLRestriction("is_delete = false")
 @SQLDelete(sql = "UPDATE Mission SET is_delete = true WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@Getter
 public class Mission {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
@@ -83,27 +90,25 @@ public class Mission {
 	@OneToMany(mappedBy = "mission")
 	private List<SuccessStamp> successStamps = new ArrayList<>();
 
-	@Builder
-	public Mission(LocalDate startAt, LocalDate endAt, String name, String emoji, String reward, int successQuota,
-		boolean isSuccess, boolean isImageRequired) {
-		this.startAt = startAt;
-		this.endAt = endAt;
-		this.name = name;
-		this.emoji = emoji;
-		this.reward = reward;
-		this.successQuota = successQuota;
-		this.isSuccess = isSuccess;
-		this.isImageRequired = isImageRequired;
-	}
+	// @Builder
+	// public Mission(LocalDate startAt, LocalDate endAt, String name, String emoji, String reward, int successQuota,
+	// 	boolean isSuccess, boolean isImageRequired) {
+	// 	this.startAt = startAt;
+	// 	this.endAt = endAt;
+	// 	this.name = name;
+	// 	this.emoji = emoji;
+	// 	this.reward = reward;
+	// 	this.successQuota = successQuota;
+	// 	this.isSuccess = isSuccess;
+	// 	this.isImageRequired = isImageRequired;
+	// }
 
 	public void setGiver(User giver) {
 		this.giver = giver;
-		giver.getGivenMissions().add(this);
 	}
 
 	public void setReceiver(User receiver) {
 		this.receiver = receiver;
-		receiver.getReceivedMissions().add(this);
 	}
 
 	public void addSuccessStamp(SuccessStamp successStamp) {
@@ -117,4 +122,18 @@ public class Mission {
 			throw new IllegalArgumentException("Start date must be before end date");
 		}
 	}
+
+	// 생성 메서드
+	public static Mission createMission(ReqMissionDto request) {
+		return Mission.builder()
+			.startAt(request.getStartAt())
+			.endAt(request.getEndAt())
+			.name(request.getName())
+			.emoji(request.getEmoji())
+			.reward(request.getReward())
+			.successQuota(request.getSuccessQuota())
+			.isImageRequired(request.isImageRequired())
+			.build();
+	}
+
 }
