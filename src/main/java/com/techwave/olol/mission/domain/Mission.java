@@ -87,21 +87,9 @@ public class Mission {
 	@JoinColumn(name = "receiver_id")
 	private User receiver;
 
+	@Builder.Default
 	@OneToMany(mappedBy = "mission")
 	private List<SuccessStamp> successStamps = new ArrayList<>();
-
-	// @Builder
-	// public Mission(LocalDate startAt, LocalDate endAt, String name, String emoji, String reward, int successQuota,
-	// 	boolean isSuccess, boolean isImageRequired) {
-	// 	this.startAt = startAt;
-	// 	this.endAt = endAt;
-	// 	this.name = name;
-	// 	this.emoji = emoji;
-	// 	this.reward = reward;
-	// 	this.successQuota = successQuota;
-	// 	this.isSuccess = isSuccess;
-	// 	this.isImageRequired = isImageRequired;
-	// }
 
 	public void setGiver(User giver) {
 		this.giver = giver;
