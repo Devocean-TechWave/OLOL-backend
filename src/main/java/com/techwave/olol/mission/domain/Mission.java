@@ -5,12 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.techwave.olol.mission.dto.request.ReqMissionDto;
-
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import com.techwave.olol.mission.dto.request.ReqMissionDto;
 import com.techwave.olol.user.domain.User;
 
 import jakarta.persistence.Column;
@@ -43,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Builder
 @Getter
 public class Mission {
+	@Setter
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(columnDefinition = "BINARY(16)")
@@ -122,6 +122,11 @@ public class Mission {
 			.successQuota(request.getSuccessQuota())
 			.isImageRequired(request.isImageRequired())
 			.build();
+	}
+
+	// successQuota 증가 메서드
+	public void incrementSuccessQuota() {
+		this.successQuota += 1;
 	}
 
 }

@@ -1,27 +1,63 @@
 package com.techwave.olol.mission.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.techwave.olol.mission.domain.Mission;
 import com.techwave.olol.mission.dto.request.ReqMissionDto;
 import com.techwave.olol.mission.repository.MissionRepository;
-import com.techwave.olol.mission.repository.SuccessStampRepository;
 import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.List;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class MissionService {
 
+	@Value("${cloud.aws.bucket.name}")
+	private String bucketName;
+
+	private final AmazonS3 amazonS3Client;
 	private final MissionRepository missionRepository;
 	private final UserRepository userRepository;
+
+	public void verifyMission(String userNickname, UUID missionId, MultipartFile multipartFile) throws IOException {
+		// 유저 조회
+		User user = userRepository.findByNickname(userNickname)
+			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userNickname));
+
+		// 미션 조회
+		Mission mission = missionRepository.findById(missionId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 ID의 미션을 찾을 수 없습니다: " + missionId));
+
+		// 파일 타입 체크
+		if (!isValidFileType(multipartFile)) {
+			throw new IllegalArgumentException("이미지 또는 영상 파일만 업로드할 수 있습니다.");
+		}
+
+		// 이미지 저장
+		saveImage(multipartFile, mission.getId());
+
+		// 미션이 isImageRequired 인지 확인.
+		if (mission.isImageRequired()) {
+			throw new IllegalArgumentException("이미지가 필요한 미션입니다.");
+		}
+		mission.incrementSuccessQuota();
+		missionRepository.save(mission);
+	}
 
 	// 미션 조회
 	public List<Mission> getMissions(String userNickname, boolean active, boolean isGiver) {
@@ -82,4 +118,56 @@ public class MissionService {
 			throw new IllegalArgumentException("미션 시작일은 미션 종료일보다 늦을 수 없습니다.");
 		}
 	}
+
+	public void saveImage(MultipartFile multipartFile, UUID missionId) throws IOException {
+		// 파일 이름에서 공백을 제거한 새로운 파일 이름 생성
+		String originalFileName = multipartFile.getOriginalFilename();
+
+		// 미션 ID를 파일명에 추가
+		String uniqueFileName = missionId.toString() + "_" + originalFileName.replaceAll("\\s", "_");
+
+		String fileName = "missions/" + uniqueFileName; // S3에서 파일이 저장될 경로
+		log.info("fileName: " + fileName);
+
+		File uploadFile = convert(multipartFile);
+
+		String uploadImageUrl = putS3(uploadFile, fileName);
+		removeNewFile(uploadFile);
+	}
+
+	private boolean isValidFileType(MultipartFile file) {
+		String contentType = file.getContentType();
+		return contentType != null && (contentType.startsWith("image/") || contentType.startsWith("video/"));
+	}
+
+	private File convert(MultipartFile file) throws IOException {
+		String originalFileName = file.getOriginalFilename();
+		String uniqueFileName = UUID.randomUUID().toString() + "_" + originalFileName.replaceAll("\\s", "_");
+
+		File convertFile = new File(uniqueFileName);
+		if (convertFile.createNewFile()) {
+			try (FileOutputStream fos = new FileOutputStream(convertFile)) {
+				fos.write(file.getBytes());
+			} catch (IOException e) {
+				log.error("파일 변환 중 오류 발생: {}", e.getMessage());
+				throw e;
+			}
+			return convertFile;
+		}
+		throw new IllegalArgumentException(String.format("파일 변환에 실패했습니다. %s", originalFileName));
+	}
+
+	private void removeNewFile(File targetFile) {
+		if (targetFile.delete()) {
+			log.info("파일이 삭제되었습니다.");
+		} else {
+			log.info("파일이 삭제되지 못했습니다.");
+		}
+	}
+
+	private String putS3(File uploadFile, String fileName) {
+		amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, uploadFile));
+		return amazonS3Client.getUrl(bucketName, fileName).toString();
+	}
+
 }
