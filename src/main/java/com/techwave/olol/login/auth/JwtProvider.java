@@ -8,7 +8,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -16,6 +15,7 @@ import com.techwave.olol.global.exception.ApiException;
 import com.techwave.olol.global.exception.Error;
 import com.techwave.olol.login.config.JwtProperties;
 import com.techwave.olol.login.dto.TokenDto;
+import com.techwave.olol.user.dto.SecurityUser;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
