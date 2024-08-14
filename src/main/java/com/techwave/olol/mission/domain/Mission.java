@@ -123,10 +123,4 @@ public class Mission {
 			.isImageRequired(request.isImageRequired())
 			.build();
 	}
-
-	// successQuota 증가 메서드
-	public void incrementSuccessQuota() {
-		this.successQuota += 1;
-	}
-
 }

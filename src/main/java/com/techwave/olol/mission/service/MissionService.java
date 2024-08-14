@@ -14,8 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.techwave.olol.mission.domain.Mission;
+import com.techwave.olol.mission.domain.SuccessStamp;
 import com.techwave.olol.mission.dto.request.ReqMissionDto;
 import com.techwave.olol.mission.repository.MissionRepository;
+import com.techwave.olol.mission.repository.SuccessStampRepository;
 import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.repository.UserRepository;
 
@@ -33,6 +35,7 @@ public class MissionService {
 	private final AmazonS3 amazonS3Client;
 	private final MissionRepository missionRepository;
 	private final UserRepository userRepository;
+	private final SuccessStampRepository successStampRepository;
 
 	public void verifyMission(String userNickname, UUID missionId, MultipartFile multipartFile) throws IOException {
 		// 유저 조회
@@ -48,14 +51,16 @@ public class MissionService {
 			throw new IllegalArgumentException("이미지 또는 영상 파일만 업로드할 수 있습니다.");
 		}
 
-		// 이미지 저장
-		saveImage(multipartFile, mission.getId());
+		// 이미지 저장 및 URL 반환
+		String uploadImageUrl = saveImage(multipartFile, mission.getId());
 
-		// 미션이 isImageRequired 인지 확인.
-		if (mission.isImageRequired()) {
-			throw new IllegalArgumentException("이미지가 필요한 미션입니다.");
-		}
-		mission.incrementSuccessQuota();
+		SuccessStamp successStamp = SuccessStamp.builder()
+			.mission(mission)
+			.imageUrl(uploadImageUrl)
+			.successDate(LocalDate.now())
+			.build();
+
+		successStampRepository.save(successStamp);
 		missionRepository.save(mission);
 	}
 
@@ -119,7 +124,7 @@ public class MissionService {
 		}
 	}
 
-	public void saveImage(MultipartFile multipartFile, UUID missionId) throws IOException {
+	public String saveImage(MultipartFile multipartFile, UUID missionId) throws IOException {
 		// 파일 이름에서 공백을 제거한 새로운 파일 이름 생성
 		String originalFileName = multipartFile.getOriginalFilename();
 
@@ -133,6 +138,7 @@ public class MissionService {
 
 		String uploadImageUrl = putS3(uploadFile, fileName);
 		removeNewFile(uploadFile);
+		return uploadImageUrl;
 	}
 
 	private boolean isValidFileType(MultipartFile file) {
