@@ -52,7 +52,9 @@ public class JwtProvider {
 
 		Collection<? extends GrantedAuthority> authorities =
 			Collections.singleton(new SimpleGrantedAuthority("USER"));
-		User principal = new User(claims.getSubject(), "", authorities);
+
+		// 클레임에서 subject를 가져와 SecurityUser 객체 생성
+		SecurityUser principal = new SecurityUser(claims.getSubject(), "", authorities);
 
 		return new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
 	}
