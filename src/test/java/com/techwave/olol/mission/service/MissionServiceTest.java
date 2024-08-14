@@ -1,11 +1,18 @@
 package com.techwave.olol.mission.service;
 
-import com.techwave.olol.mission.domain.Mission;
-import com.techwave.olol.mission.dto.request.ReqMissionDto;
-import com.techwave.olol.mission.repository.MissionRepository;
-import com.techwave.olol.mission.repository.SuccessStampRepository;
-import com.techwave.olol.user.domain.User;
-import com.techwave.olol.user.repository.UserRepository;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,17 +21,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Method;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.*;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.PutObjectResult;
+import com.techwave.olol.mission.domain.Mission;
+import com.techwave.olol.mission.domain.SuccessStamp;
+import com.techwave.olol.mission.dto.request.ReqMissionDto;
+import com.techwave.olol.mission.repository.MissionRepository;
+import com.techwave.olol.mission.repository.SuccessStampRepository;
+import com.techwave.olol.user.domain.User;
+import com.techwave.olol.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class MissionServiceTest {
@@ -36,6 +46,9 @@ public class MissionServiceTest {
 	private SuccessStampRepository successStampRepository;
 
 	@Mock
+	private AmazonS3 amazonS3Client;
+
+	@Mock
 	private UserRepository userRepository;
 
 	@InjectMocks
@@ -43,13 +56,21 @@ public class MissionServiceTest {
 
 	private User giver;
 	private User receiver;
+	private User user;
 	private ReqMissionDto reqMissionDto;
 	private Mission mission;
+	private MultipartFile multipartFile;
+
+	@Value("${cloud.aws.bucket.name}")
+	private String bucketName;
 
 	@BeforeEach
 	void setUp() {
 		giver = new User();
 		giver.setNickname("giverNickname");
+
+		user = new User();
+		user.setNickname("userNickname");
 
 		receiver = new User();
 		receiver.setNickname("receiverNickname");
@@ -63,6 +84,9 @@ public class MissionServiceTest {
 		mission = Mission.createMission(reqMissionDto);
 		mission.setGiver(giver);
 		mission.setReceiver(receiver);
+		mission.setId(UUID.randomUUID());
+
+		multipartFile = new MockMultipartFile("file", "test.png", "image/png", "test image content".getBytes());
 	}
 
 	@Test
@@ -137,5 +161,31 @@ public class MissionServiceTest {
 			assertInstanceOf(IllegalArgumentException.class, e.getCause());
 			assertEquals("미션 주차는 현재 주차보다 이전일 수 없습니다.", e.getCause().getMessage());
 		}
+	}
+
+	@Test
+	@DisplayName("이미지 저장을 포함한 미션 검증이 성공적으로 수행된다.")
+	void testVerifyMissionWithImageSave() throws IOException {
+		// given
+		when(userRepository.findByNickname("userNickname")).thenReturn(Optional.of(user));
+		when(missionRepository.findById(mission.getId())).thenReturn(Optional.of(mission));
+
+		// mock AmazonS3 putObject method
+		when(amazonS3Client.putObject(any(PutObjectRequest.class))).thenReturn(new PutObjectResult());
+
+		// mock AmazonS3 getUrl method to return a dummy URL
+		when(amazonS3Client.getUrl(eq(bucketName), anyString())).thenReturn(new URL("http://localhost:8080/test-url"));
+
+		// when
+		missionService.verifyMission("userNickname", mission.getId(), multipartFile);
+
+		// then
+		verify(userRepository, times(1)).findByNickname("userNickname");
+		verify(missionRepository, times(1)).findById(mission.getId());
+		verify(amazonS3Client, times(1)).putObject(any(PutObjectRequest.class));
+		verify(amazonS3Client, times(1)).getUrl(eq(bucketName), anyString());
+		verify(successStampRepository, times(1)).save(any(SuccessStamp.class));  // SuccessStamp가 저장되었는지 확인
+		verify(missionRepository, times(1)).save(mission);
+
 	}
 }
