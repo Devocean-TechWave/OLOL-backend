@@ -14,6 +14,7 @@ import com.techwave.olol.global.exception.ApiException;
 import com.techwave.olol.global.exception.Error;
 import com.techwave.olol.login.constant.AuthType;
 import com.techwave.olol.login.repository.RefreshTokenRepository;
+import com.techwave.olol.user.domain.GenderType;
 import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.dto.UserDto;
 import com.techwave.olol.user.dto.request.EditUserRequest;
@@ -47,11 +48,18 @@ public class UserService {
 		return userOpt.isEmpty();
 	}
 
+	// 성별 예외처리 코드 추가
 	@Transactional
 	public void kakaoJoin(String id, KakaoJoinRequest request) {
 		User user = findById(id);
 		if (user.getAuthType() != AuthType.KAKAO)
 			throw new ApiException(Error.AUTH_TYPE_MISMATCH);
+
+		if (!GenderType.MALE.getName().equalsIgnoreCase(request.getGender()) &&
+			!GenderType.FEMALE.getName().equalsIgnoreCase(request.getGender())) {
+			throw new ApiException(Error.INVALID_DATA);
+		}
+
 		user.setKakaoUser(request);
 
 		userRepository.save(user);
