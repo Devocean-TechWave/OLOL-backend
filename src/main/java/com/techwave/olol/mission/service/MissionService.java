@@ -37,10 +37,10 @@ public class MissionService {
 	private final UserRepository userRepository;
 	private final SuccessStampRepository successStampRepository;
 
-	public void verifyMission(String userNickname, UUID missionId, MultipartFile multipartFile) throws IOException {
+	public void verifyMission(String userId, UUID missionId, MultipartFile multipartFile) throws IOException {
 		// 유저 조회
-		User user = userRepository.findByNickname(userNickname)
-			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userNickname));
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
 
 		// 미션 조회
 		Mission mission = missionRepository.findById(missionId)
@@ -65,10 +65,10 @@ public class MissionService {
 	}
 
 	// 미션 조회
-	public List<Mission> getMissions(String userNickname, boolean active, boolean isGiver) {
+	public List<Mission> getMissions(String userId, boolean active, boolean isGiver) {
 		// 유저 조회
-		User user = userRepository.findByNickname(userNickname)
-			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userNickname));
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
 
 		// 유저가 생성한 모든 미션 조회
 		if (isGiver) {
@@ -83,14 +83,17 @@ public class MissionService {
 
 	}
 
-	public void registerMission(String userNickname, ReqMissionDto reqMissionDto) {
+	public void registerMission(String userId, ReqMissionDto reqMissionDto) {
+		log.info("userNickname: {}", userId);
 		// 유저 조회
-		User giver = userRepository.findByNickname(userNickname)
-			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userNickname));
+		User giver = userRepository.findById(userId)
+			.orElseThrow(
+				() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
 
 		// 미션 유저 조회
-		User receiver = userRepository.findByNickname(reqMissionDto.getReceiverId())
-			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + reqMissionDto.getReceiverId()));
+		User receiver = userRepository.findById(reqMissionDto.getReceiverId())
+			.orElseThrow(
+				() -> new IllegalArgumentException(" --> 해당 닉네임의 유저를 찾을 수 없습니다: " + reqMissionDto.getReceiverId()));
 		// 미션 작성 가능성 validate
 		checkMission(reqMissionDto);
 

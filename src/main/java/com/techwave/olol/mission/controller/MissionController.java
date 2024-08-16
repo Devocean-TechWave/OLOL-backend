@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.techwave.olol.mission.domain.Mission;
 import com.techwave.olol.mission.dto.request.ReqMissionDto;
 import com.techwave.olol.mission.service.MissionService;
-import com.techwave.olol.user.domain.User;
+import com.techwave.olol.user.dto.SecurityUser;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,21 +32,21 @@ public class MissionController {
 
 	// 미션 등록
 	@PostMapping
-	public ResponseEntity<String> registerMission(@AuthenticationPrincipal User user,
+	public ResponseEntity<String> registerMission(@AuthenticationPrincipal SecurityUser user,
 		@RequestBody ReqMissionDto reqMissionDto) {
 
-		missionService.registerMission("dummyNickname", reqMissionDto);
+		missionService.registerMission(user.getUsername(), reqMissionDto);
 
 		return ResponseEntity.ok("미션이 생성되었습니다.");
 	}
 
 	// 미션 인증
 	@PostMapping("/verification/{missionId}")
-	public ResponseEntity<String> verifyMission(@AuthenticationPrincipal User user,
+	public ResponseEntity<String> verifyMission(@AuthenticationPrincipal SecurityUser user,
 		@PathVariable("missionId") UUID missionId,
 		@RequestParam("file") MultipartFile file) {
 		try {
-			missionService.verifyMission("dummyNickname", missionId, file);
+			missionService.verifyMission(user.getUsername(), missionId, file);
 			return ResponseEntity.ok("미션이 인증되었습니다.");
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body("미션 인증에 실패했습니다: " + e.getMessage());
@@ -55,19 +55,19 @@ public class MissionController {
 
 	// 미션 조회
 	@GetMapping("/received/{userId}")
-	public ResponseEntity<?> getProgressMission(@AuthenticationPrincipal User user,
+	public ResponseEntity<?> getProgressMission(@AuthenticationPrincipal SecurityUser user,
 		@PathVariable("userId") UUID userId,
 		@RequestParam boolean active) {
 
-		List<Mission> missions = missionService.getMissions("dummyNickname", active, false);
+		List<Mission> missions = missionService.getMissions(user.getUsername(), active, false);
 		return ResponseEntity.ok(missions);
 	}
 
 	@GetMapping("/given/{userId}")
-	public ResponseEntity<?> getGivenMissions(@AuthenticationPrincipal User user,
+	public ResponseEntity<?> getGivenMissions(@AuthenticationPrincipal SecurityUser user,
 		@PathVariable UUID userId,
 		@RequestParam boolean active) {
-		List<Mission> missions = missionService.getMissions("dummyNickname", active, true);
+		List<Mission> missions = missionService.getMissions(user.getUsername(), active, true);
 		return ResponseEntity.ok(missions);
 	}
 }
