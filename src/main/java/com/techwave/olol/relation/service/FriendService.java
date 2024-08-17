@@ -16,14 +16,30 @@ public class FriendService {
 
 	private final UserRelationShipRepository userRelationShipRepository;
 
+	/**
+	 * 내가 보낸 친구 요청 목록을 가져온다.
+	 * @param userID 받아 올 사용자 ID
+	 * @return 친구 요청 목록
+	 */
 	public FriendReqListDto getFriendRequest(String userID) {
 		return getFriendRequestByUserId(userID, true);
 	}
 
+	/**
+	 * 내가 받은 친구 요청 목록을 가져온다.
+	 * @param userID 받아 올 사용자 ID
+	 * @return 친구 요청 목록
+	 */
 	public FriendReqListDto getSentFriendRequest(String userID) {
 		return getFriendRequestByUserId(userID, false);
 	}
 
+	/**
+	 * 사용자 ID에 따라 친구 요청 목록을 가져온다.
+	 * @param userID 받아 올 사용자 ID
+	 * @param isReceiver 받은 친구 요청인지 보낸 친구요청인지 여부
+	 * @return 친구 요청 목록
+	 */
 	private FriendReqListDto getFriendRequestByUserId(String userID, boolean isReceiver) {
 		List<UserRelationShip> friendReq;
 
