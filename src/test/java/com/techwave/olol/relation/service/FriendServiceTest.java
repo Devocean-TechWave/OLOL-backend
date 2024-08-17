@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,8 @@ import com.techwave.olol.relation.dto.response.FriendReqDto;
 import com.techwave.olol.relation.dto.response.FriendReqListDto;
 import com.techwave.olol.relation.repository.UserRelationShipRepository;
 import com.techwave.olol.user.domain.User;
+import com.techwave.olol.user.dto.UserInfoDto;
+import com.techwave.olol.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 class FriendServiceTest {
@@ -30,86 +31,167 @@ class FriendServiceTest {
 	@Mock
 	private UserRelationShipRepository userRelationShipRepository;
 
+	@Mock
+	private UserRepository userRepository;
+
 	@Test
 	@DisplayName("내가 보낸 친구 요청 목록이 비어있을 때 잘 가져올 수 있다.")
 	void getFriendRequestTest() {
-		testFriendRequest(Collections.emptyList(), friendService::getFriendRequest, "1", true);
+		// Arrange
+		mockFriendRequestRepository(Collections.emptyList(), "1", true);
+
+		// Act
+		FriendReqListDto friendRequest = friendService.getFriendRequest("1");
+
+		// Assert
+		assertThat(friendRequest.getFriendReqList()).isEmpty();
 	}
 
 	@Test
 	@DisplayName("내가 보낸 친구 요청 목록이 비어있지 않을 때 잘 가져올 수 있다.")
 	void getFriendRequestTest2() {
+		// Arrange
 		UserRelationShip relationship = createMockRelationship("1", "John Doe", "johnd", "2", "Jane Doe", "janed");
+		mockFriendRequestRepository(Collections.singletonList(relationship), "1", true);
 
-		testFriendRequest(Collections.singletonList(relationship), friendService::getFriendRequest, "1", true);
+		// Act
+		FriendReqListDto friendRequest = friendService.getFriendRequest("1");
+
+		// Assert
+		assertFriendRequestList(friendRequest, Collections.singletonList(relationship));
 	}
 
 	@Test
 	@DisplayName("내가 받은 친구 요청 목록이 비어있을 때 잘 가져올 수 있다.")
 	void getSentFriendRequestTest() {
-		testFriendRequest(Collections.emptyList(), friendService::getSentFriendRequest, "1", false);
+		// Arrange
+		mockFriendRequestRepository(Collections.emptyList(), "1", false);
+
+		// Act
+		FriendReqListDto friendRequest = friendService.getSentFriendRequest("1");
+
+		// Assert
+		assertThat(friendRequest.getFriendReqList()).isEmpty();
 	}
 
 	@Test
 	@DisplayName("내가 받은 친구 요청 목록이 비어있지 않을 때 잘 가져올 수 있다.")
 	void getSentFriendRequestTest2() {
+		// Arrange
 		UserRelationShip relationship = createMockRelationship("1", "John Doe", "johnd", "2", "Jane Doe", "janed");
+		mockFriendRequestRepository(Collections.singletonList(relationship), "1", false);
 
-		testFriendRequest(Collections.singletonList(relationship), friendService::getSentFriendRequest, "1", false);
+		// Act
+		FriendReqListDto friendRequest = friendService.getSentFriendRequest("1");
+
+		// Assert
+		assertFriendRequestList(friendRequest, Collections.singletonList(relationship));
 	}
 
-	// 친구 요청 목록을 테스트하는 공통 메소드
-	private void testFriendRequest(List<UserRelationShip> relationships,
-		Function<String, FriendReqListDto> requestFunction,
-		String userId, boolean isReceiver) {
+	@Test
+	@DisplayName("친구 요청을 생성할 수 있다.")
+	void requestFriendTest() {
+		// Arrange
+		User sender = createMockUser("1", "John Doe", "johnd", "http://localhost:8080/profile.png");
+		User receiver = createMockUser("2", "Jane Doe", "janed", "http://localhost:8080/profile2.png");
 
+		when(userRepository.findUserById("1")).thenReturn(sender);
+		when(userRepository.findUserById("2")).thenReturn(receiver);
+		when(userRelationShipRepository.existsBySenderAndReceiverAndRelationType(sender, receiver, RelationType.FRIEND))
+			.thenReturn(false);
+
+		UserRelationShip relationship = UserRelationShip.builder()
+			.sender(sender)
+			.receiver(receiver)
+			.relationType(RelationType.FRIEND)
+			.build();
+
+		when(userRelationShipRepository.save(any())).thenReturn(relationship);
+
+		// Act
+		UserInfoDto userInfoDto = friendService.requestFriend("1", "2", RelationType.FRIEND);
+
+		// Assert
+		assertUserInfoDtoMatchesUser(userInfoDto, receiver);
+	}
+
+	@Test
+	@DisplayName("이미 친구 요청이 존재할 때 예외를 던진다.")
+	void requestFriendTest2() {
+		// Arrange
+		User sender = createMockUser("1", "John Doe", "johnd", "http://localhost:8080/profile.png");
+		User receiver = createMockUser("2", "Jane Doe", "janed", "http://localhost:8080/profile2.png");
+
+		when(userRepository.findUserById("1")).thenReturn(sender);
+		when(userRepository.findUserById("2")).thenReturn(receiver);
+		when(userRelationShipRepository.existsBySenderAndReceiverAndRelationType(sender, receiver, RelationType.FRIEND))
+			.thenReturn(true);
+
+		// Act & Assert
+		assertThatThrownBy(() -> friendService.requestFriend("1", "2", RelationType.FRIEND))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessage("이미 동일한 친구 요청이 존재합니다.");
+	}
+
+	// 친구 요청을 Mocking하는 메소드
+	private void mockFriendRequestRepository(List<UserRelationShip> relationships, String userId, boolean isReceiver) {
 		if (isReceiver) {
 			when(userRelationShipRepository.findAllByReceiverId(userId)).thenReturn(relationships);
 		} else {
 			when(userRelationShipRepository.findAllBySenderId(userId)).thenReturn(relationships);
 		}
-
-		FriendReqListDto friendRequest = requestFunction.apply(userId);
-
-		if (relationships.isEmpty()) {
-			assertThat(friendRequest.getFriendReqList()).isEmpty();
-		} else {
-			assertThat(friendRequest.getFriendReqList()).isNotEmpty();
-			assertThat(friendRequest.getFriendReqList()).hasSize(1);
-
-			FriendReqDto dto = friendRequest.getFriendReqList().get(0);
-			UserRelationShip relationship = relationships.get(0);
-
-			assertThat(dto.getId()).isEqualTo(relationship.getId());
-			assertThat(dto.getUserInfo().getId()).isEqualTo(relationship.getSender().getId());
-			assertThat(dto.getUserInfo().getName()).isEqualTo(relationship.getSender().getName());
-			assertThat(dto.getUserInfo().getNickname()).isEqualTo(relationship.getSender().getNickname());
-			assertThat(dto.getUserInfo().getProfileUrl()).isEqualTo(relationship.getSender().getProfileUrl());
-		}
 	}
 
-	// 관계를 설정하는 공통 메소드
+	// User 객체를 생성하는 메소드
+	private User createMockUser(String id, String name, String nickname, String profileUrl) {
+		return User.builder()
+			.id(id)
+			.name(name)
+			.nickname(nickname)
+			.profileUrl(profileUrl)
+			.build();
+	}
+
+	// UserRelationShip 객체를 생성하는 메소드
 	private UserRelationShip createMockRelationship(String senderId, String senderName, String senderNickname,
 		String receiverId, String receiverName, String receiverNickname) {
 
-		User sender = User.builder()
-			.snsId(senderId)
-			.name(senderName)
-			.nickname(senderNickname)
-			.profileUrl("http://localhost:8080/profile.png")
-			.build();
-
-		User receiver = User.builder()
-			.snsId(receiverId)
-			.name(receiverName)
-			.nickname(receiverNickname)
-			.profileUrl("http://localhost:8080/profile2.png")
-			.build();
+		User sender = createMockUser(senderId, senderName, senderNickname, "http://localhost:8080/profile.png");
+		User receiver = createMockUser(receiverId, receiverName, receiverNickname,
+			"http://localhost:8080/profile2.png");
 
 		return UserRelationShip.builder()
 			.sender(sender)
 			.receiver(receiver)
-			.relationType(RelationType.FRIEND) // 실제 사용 중인 enum 값으로 대체 필요
+			.relationType(RelationType.FRIEND)
 			.build();
+	}
+
+	// FriendReqListDto를 검증하는 메소드
+	private void assertFriendRequestList(FriendReqListDto friendRequest, List<UserRelationShip> relationships) {
+		if (relationships.isEmpty()) {
+			assertThat(friendRequest.getFriendReqList()).isEmpty();
+		} else {
+			assertThat(friendRequest.getFriendReqList()).hasSize(relationships.size());
+
+			for (int i = 0; i < relationships.size(); i++) {
+				FriendReqDto dto = friendRequest.getFriendReqList().get(i);
+				UserRelationShip relationship = relationships.get(i);
+
+				assertThat(dto.getId()).isEqualTo(relationship.getId());
+				assertThat(dto.getUserInfo().getId()).isEqualTo(relationship.getSender().getId());
+				assertThat(dto.getUserInfo().getName()).isEqualTo(relationship.getSender().getName());
+				assertThat(dto.getUserInfo().getNickname()).isEqualTo(relationship.getSender().getNickname());
+				assertThat(dto.getUserInfo().getProfileUrl()).isEqualTo(relationship.getSender().getProfileUrl());
+			}
+		}
+	}
+
+	// UserInfoDto를 검증하는 메소드
+	private void assertUserInfoDtoMatchesUser(UserInfoDto userInfoDto, User user) {
+		assertThat(userInfoDto.getId()).isEqualTo(user.getId());
+		assertThat(userInfoDto.getName()).isEqualTo(user.getName());
+		assertThat(userInfoDto.getNickname()).isEqualTo(user.getNickname());
+		assertThat(userInfoDto.getProfileUrl()).isEqualTo(user.getProfileUrl());
 	}
 }
