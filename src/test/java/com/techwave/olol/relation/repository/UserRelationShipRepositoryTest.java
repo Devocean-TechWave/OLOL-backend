@@ -51,12 +51,13 @@ class UserRelationShipRepositoryTest {
 	@Test
 	@DisplayName("유저가 보낸 친구 요청을 조회할 수 있다.")
 	@Sql(scripts = {"/init-relation.sql"})
-	void findAllBySenderId() {
+	void findAllBySenderIdAndRelationStatus() {
 		// given
 		User sender = userRepository.findById("1").orElseThrow();
 
 		// when
-		List<UserRelationShip> sentRequests = userRelationShipRepository.findAllBySenderId(sender.getId());
+		List<UserRelationShip> sentRequests = userRelationShipRepository.findAllBySenderIdAndRelationStatus(
+			sender.getId(), RelationStatus.REQUEST);
 
 		// then
 		Assertions.assertEquals(9, sentRequests.size());
@@ -65,12 +66,13 @@ class UserRelationShipRepositoryTest {
 	@Test
 	@DisplayName("유저가 받은 친구 요청이 없을 때 오류가 나지 않는다.")
 	@Sql(scripts = {"/init-relation.sql"})
-	void findAllByReceiverId_Empty() {
+	void findAllByReceiverIdAndRelationStatus_Empty() {
 		// given
 		User receiver = userRepository.findById("11").orElseThrow();
 
 		// when
-		List<UserRelationShip> receivedRequests = userRelationShipRepository.findAllByReceiverId(receiver.getId());
+		List<UserRelationShip> receivedRequests = userRelationShipRepository.findAllByReceiverIdAndRelationStatus(
+			receiver.getId(), RelationStatus.REQUEST);
 
 		// then
 		Assertions.assertEquals(0, receivedRequests.size());
@@ -79,12 +81,13 @@ class UserRelationShipRepositoryTest {
 	@Test
 	@DisplayName("유저가 받은 친구 요청을 조회할 수 있다.")
 	@Sql(scripts = {"/init-relation.sql"})
-	void findAllByReceiverId() {
+	void findAllByReceiverIdAndRelationStatus() {
 		// given
 		User receiver = userRepository.findById("1").orElseThrow();
 
 		// when
-		List<UserRelationShip> receivedRequests = userRelationShipRepository.findAllByReceiverId(receiver.getId());
+		List<UserRelationShip> receivedRequests = userRelationShipRepository.findAllByReceiverIdAndRelationStatus(
+			receiver.getId(), RelationStatus.REQUEST);
 
 		// then
 		Assertions.assertEquals(2, receivedRequests.size());
@@ -99,8 +102,9 @@ class UserRelationShipRepositoryTest {
 		User receiver = userRepository.findById("2").orElseThrow();
 
 		// when
-		boolean exists = userRelationShipRepository.existsBySenderAndReceiverAndRelationType(sender, receiver,
-			RelationType.FRIEND);
+		boolean exists = userRelationShipRepository.existsBySenderAndReceiverAndRelationTypeAndRelationStatus(sender,
+			receiver,
+			RelationType.FRIEND, RelationStatus.REQUEST);
 
 		// then
 		Assertions.assertTrue(exists);
@@ -115,8 +119,8 @@ class UserRelationShipRepositoryTest {
 		User receiver = userRepository.findById("2").orElseThrow();
 
 		// when
-		boolean exists = userRelationShipRepository.existsBySenderAndReceiverAndRelationType(sender, receiver,
-			RelationType.CAT);
+		boolean exists = userRelationShipRepository.existsBySenderAndReceiverAndRelationTypeAndRelationStatus(sender,
+			receiver, RelationType.CAT, RelationStatus.REQUEST);
 
 		// then
 		Assertions.assertFalse(exists);
@@ -130,7 +134,9 @@ class UserRelationShipRepositoryTest {
 		User sender = userRepository.findById("1").orElseThrow();
 		User receiver = userRepository.findById("2").orElseThrow();
 
-		UserRelationShip relationship = userRelationShipRepository.findAllBySenderId(sender.getId()).get(0);
+		UserRelationShip relationship = userRelationShipRepository.findAllBySenderIdAndRelationStatus(sender.getId(),
+				RelationStatus.REQUEST)
+			.get(0);
 
 		// when
 		userRelationShipRepository.delete(relationship);
@@ -141,16 +147,18 @@ class UserRelationShipRepositoryTest {
 
 		// 확인 2: 삭제된 엔티티가 existsBySenderAndReceiverAndRelationType에서도 제외되는지 확인
 		Assertions.assertFalse(
-			userRelationShipRepository.existsBySenderAndReceiverAndRelationType(sender, receiver, RelationType.FRIEND));
+			userRelationShipRepository.existsBySenderAndReceiverAndRelationTypeAndRelationStatus(sender, receiver,
+				RelationType.FRIEND, RelationStatus.REQUEST));
 	}
 
 	@Test
 	@DisplayName("유저 관계가 삭제된 후 더 이상 조회되지 않는다.")
 	@Sql(scripts = {"/init-relation.sql"})
-	void findAllByReceiverId_AfterDelete() {
+	void findAllByReceiverIdAndRelationStatus_AfterDelete() {
 		// given
 		User receiver = userRepository.findById("1").orElseThrow();
-		List<UserRelationShip> receivedRequests = userRelationShipRepository.findAllByReceiverId(receiver.getId());
+		List<UserRelationShip> receivedRequests = userRelationShipRepository.findAllByReceiverIdAndRelationStatus(
+			receiver.getId(), RelationStatus.REQUEST);
 
 		UserRelationShip relationshipToDelete = receivedRequests.get(0);
 
@@ -158,8 +166,8 @@ class UserRelationShipRepositoryTest {
 		userRelationShipRepository.delete(relationshipToDelete);
 
 		// when
-		List<UserRelationShip> updatedReceivedRequests = userRelationShipRepository.findAllByReceiverId(
-			receiver.getId());
+		List<UserRelationShip> updatedReceivedRequests = userRelationShipRepository.findAllByReceiverIdAndRelationStatus(
+			receiver.getId(), RelationStatus.REQUEST);
 
 		// then
 		Assertions.assertEquals(receivedRequests.size() - 1, updatedReceivedRequests.size());
@@ -169,7 +177,7 @@ class UserRelationShipRepositoryTest {
 	@Test
 	@DisplayName("특정 유저가 보낸 요청과 받은 요청 중에서 ACCEPT 상태인 관계를 조회할 수 있다.")
 	@Sql(scripts = {"/init-relation.sql"})
-	void findAllBySenderIdAndRelationStatusOrReceiverIdAndRelationStatus_Accepted() {
+	void findAllBySenderIdAndRelationStatusAndRelationStatusOrReceiverIdAndRelationStatus_Accepted() {
 		// given
 		// 스크립트에서 relationStatus가 'REQUEST'로 되어있으므로 테스트를 위해 일부 데이터를 'ACCEPT'로 변경합니다.
 		UserRelationShip relationship1 = userRelationShipRepository.findById(1L).orElseThrow();
@@ -196,7 +204,7 @@ class UserRelationShipRepositoryTest {
 	@Test
 	@DisplayName("ACCEPT 상태가 아닌 경우는 조회되지 않는다.")
 	@Sql(scripts = {"/init-relation.sql"})
-	void findAllBySenderIdAndRelationStatusOrReceiverIdAndRelationStatus_NotAccepted() {
+	void findAllBySenderIdAndRelationStatusAndRelationStatusOrReceiverIdAndRelationStatus_NotAccepted() {
 		// given
 		String userId = "1"; // User1에 대한 테스트
 
@@ -218,8 +226,9 @@ class UserRelationShipRepositoryTest {
 		String receiverId = "2";
 
 		// when
-		Optional<UserRelationShip> relationship = userRelationShipRepository.findBySenderIdAndReceiverId(senderId,
-			receiverId);
+		Optional<UserRelationShip> relationship = userRelationShipRepository.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
+			senderId,
+			receiverId, receiverId, senderId);
 
 		// then
 		Assertions.assertTrue(relationship.isPresent());
@@ -236,8 +245,9 @@ class UserRelationShipRepositoryTest {
 		String receiverId = "999"; // 존재하지 않는 사용자 ID
 
 		// when
-		Optional<UserRelationShip> relationship = userRelationShipRepository.findBySenderIdAndReceiverId(senderId,
-			receiverId);
+		Optional<UserRelationShip> relationship = userRelationShipRepository.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
+			senderId,
+			receiverId, receiverId, senderId);
 
 		// then
 		Assertions.assertFalse(relationship.isPresent());
