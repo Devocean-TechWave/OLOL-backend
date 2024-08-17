@@ -133,6 +133,97 @@ class FriendServiceTest {
 			.hasMessage("이미 동일한 친구 요청이 존재합니다.");
 	}
 
+	@Test
+	@DisplayName("내가 보낸 친구 요청을 취소할 수 있다.")
+	void cancelRequestFriend_Success() {
+		// Arrange
+		User sender = createMockUser("1", "John Doe", "johnd", "http://localhost:8080/profile.png");
+		User receiver = createMockUser("2", "Jane Doe", "janed", "http://localhost:8080/profile2.png");
+
+		UserRelationShip relationship = UserRelationShip.builder()
+			.id(100L)
+			.sender(sender)
+			.receiver(receiver)
+			.relationType(RelationType.FRIEND)
+			.isDelete(false)
+			.build();
+
+		when(userRelationShipRepository.findById(100L)).thenReturn(java.util.Optional.of(relationship));
+
+		// Act
+		friendService.cancelRequestFriend("1", 100L);
+
+		// Assert
+		verify(userRelationShipRepository, times(1)).delete(relationship);
+	}
+
+	@Test
+	@DisplayName("다른 사용자의 요청을 취소하려고 할 때 예외를 던진다.")
+	void cancelRequestFriend_UnauthorizedUser() {
+		// Arrange
+		User sender = createMockUser("1", "John Doe", "johnd", "http://localhost:8080/profile.png");
+		User receiver = createMockUser("2", "Jane Doe", "janed", "http://localhost:8080/profile2.png");
+
+		UserRelationShip relationship = UserRelationShip.builder()
+			.id(100L)
+			.sender(sender)
+			.receiver(receiver)
+			.relationType(RelationType.FRIEND)
+			.isDelete(false)
+			.build();
+
+		when(userRelationShipRepository.findById(100L)).thenReturn(java.util.Optional.of(relationship));
+
+		// Act & Assert
+		assertThatThrownBy(() -> friendService.cancelRequestFriend("2", 100L))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessage("다른 사용자의 요청을 취소할 수 없습니다.");
+
+		// verify that delete was not called
+		verify(userRelationShipRepository, never()).delete(any(UserRelationShip.class));
+	}
+
+	@Test
+	@DisplayName("이미 취소된 요청을 다시 취소하려고 할 때 예외를 던진다.")
+	void cancelRequestFriend_AlreadyDeleted() {
+		// Arrange
+		User sender = createMockUser("1", "John Doe", "johnd", "http://localhost:8080/profile.png");
+		User receiver = createMockUser("2", "Jane Doe", "janed", "http://localhost:8080/profile2.png");
+
+		UserRelationShip relationship = UserRelationShip.builder()
+			.id(100L)
+			.sender(sender)
+			.receiver(receiver)
+			.relationType(RelationType.FRIEND)
+			.isDelete(true) // 이미 취소된 요청
+			.build();
+
+		when(userRelationShipRepository.findById(100L)).thenReturn(java.util.Optional.of(relationship));
+
+		// Act & Assert
+		assertThatThrownBy(() -> friendService.cancelRequestFriend("1", 100L))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessage("이미 취소된 요청입니다.");
+
+		// verify that delete was not called
+		verify(userRelationShipRepository, never()).delete(any(UserRelationShip.class));
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 요청을 취소하려고 할 때 예외를 던진다.")
+	void cancelRequestFriend_RequestNotFound() {
+		// Arrange
+		when(userRelationShipRepository.findById(100L)).thenReturn(java.util.Optional.empty());
+
+		// Act & Assert
+		assertThatThrownBy(() -> friendService.cancelRequestFriend("1", 100L))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("존재하지 않는 요청입니다.");
+
+		// verify that delete was not called
+		verify(userRelationShipRepository, never()).delete(any(UserRelationShip.class));
+	}
+
 	// 친구 요청을 Mocking하는 메소드
 	private void mockFriendRequestRepository(List<UserRelationShip> relationships, String userId, boolean isReceiver) {
 		if (isReceiver) {
