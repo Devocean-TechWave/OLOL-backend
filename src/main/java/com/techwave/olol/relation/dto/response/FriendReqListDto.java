@@ -13,9 +13,15 @@ public class FriendReqListDto {
 	@Schema(description = "친구 요청 목록")
 	List<FriendReqDto> friendReqList;
 
-	public void setByUserRelationList(List<UserRelationShip> userRelationList) {
+	public void setByUserRelationSenderList(List<UserRelationShip> userRelationList) {
 		this.friendReqList = userRelationList.stream()
-			.map(FriendReqDto::fromEntity)
+			.map(FriendReqDto::fromSenderEntity)
+			.collect(Collectors.toList());
+	}
+
+	public void setByUserRelationReceiverList(List<UserRelationShip> userRelationList) {
+		this.friendReqList = userRelationList.stream()
+			.map(FriendReqDto::fromReceiverEntity)
 			.collect(Collectors.toList());
 	}
 }

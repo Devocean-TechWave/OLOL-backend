@@ -5,9 +5,11 @@ import com.techwave.olol.relation.domain.RelationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class FriendRequestDto {
 	@Schema(description = "친구 요청을 보낼 사용자 ID", example = "1234567890")
 	@NotEmpty(message = "사용자 ID는 필수 항목입니다.")

@@ -21,7 +21,15 @@ public class FriendReqDto {
 	@Schema(description = "요청을 보낸 시간", example = "2024-07-27 17:37:31")
 	LocalDateTime requestedAt;
 
-	public static FriendReqDto fromEntity(UserRelationShip relationship) {
+	public static FriendReqDto fromReceiverEntity(UserRelationShip relationship) {
+		return FriendReqDto.builder()
+			.id(relationship.getId())
+			.userInfo(UserInfoDto.fromEntity(relationship.getReceiver()))
+			.requestedAt(relationship.getCreatedTime()) // createdAt 필드 필요
+			.build();
+	}
+
+	public static FriendReqDto fromSenderEntity(UserRelationShip relationship) {
 		return FriendReqDto.builder()
 			.id(relationship.getId())
 			.userInfo(UserInfoDto.fromEntity(relationship.getSender()))
