@@ -58,26 +58,26 @@ public class FriendService {
 	 * @return 친구 요청 목록
 	 */
 	public FriendReqListDto getSentFriendRequest(String userID) {
+		System.out.println("userID = " + userID);
 		return getFriendRequestByUserId(userID, false);
 	}
 
 	/**
 	 * 사용자 ID에 따라 친구 요청 목록을 가져온다.
 	 * @param userID 받아 올 사용자 ID
-	 * @param isReceiver 받은 친구 요청인지 보낸 친구요청인지 여부
+	 * @param isReceiver 내가 받은 요청인지 여부
 	 * @return 친구 요청 목록
 	 */
 	private FriendReqListDto getFriendRequestByUserId(String userID, boolean isReceiver) {
 		List<UserRelationShip> friendReq;
-
-		if (isReceiver) {
-			friendReq = userRelationShipRepository.findAllByReceiverId(userID);
-		} else {
-			friendReq = userRelationShipRepository.findAllBySenderId(userID);
-		}
-
 		FriendReqListDto friendReqListDto = new FriendReqListDto();
-		friendReqListDto.setByUserRelationList(friendReq);
+		if (isReceiver) {
+			friendReq = userRelationShipRepository.findAllByReceiverIdAndRelationStatus(userID, RelationStatus.REQUEST);
+			friendReqListDto.setByUserRelationSenderList(friendReq);
+		} else {
+			friendReq = userRelationShipRepository.findAllBySenderIdAndRelationStatus(userID, RelationStatus.REQUEST);
+			friendReqListDto.setByUserRelationReceiverList(friendReq);
+		}
 		return friendReqListDto;
 	}
 
@@ -95,9 +95,12 @@ public class FriendService {
 		User receiver = userRepository.findUserById(receiverId);
 
 		if (userRelationShipRepository
-			.existsBySenderAndReceiverAndRelationType(sender, receiver, relationType))
+			.existsBySenderAndReceiverAndRelationTypeAndRelationStatus(sender, receiver, relationType,
+				RelationStatus.REQUEST))
 			throw new IllegalStateException("이미 동일한 친구 요청이 존재합니다.");
-
+		if (userRelationShipRepository.existsBySenderAndReceiverAndRelationTypeAndRelationStatus(receiver, sender,
+			relationType, RelationStatus.ACCEPT))
+			throw new IllegalStateException("이미 친구입니다.");
 		UserRelationShip userRelationShip = UserRelationShip.builder()
 			.sender(sender)
 			.receiver(receiver)
@@ -113,6 +116,7 @@ public class FriendService {
 	 * @param userId 사용자 ID
 	 * @param requestId 요청 ID
 	 */
+	@Transactional
 	public void cancelRequestFriend(String userId, Long requestId) {
 		// 요청이 존재하는지 확인하고 가져옵니다.
 		UserRelationShip relationship = userRelationShipRepository.findById(requestId)
@@ -139,6 +143,7 @@ public class FriendService {
 	 * @param requestId 요청 ID
 	 * @param isAccept 수락 여부
 	 */
+	@Transactional
 	public void responseFriend(String userId, Long requestId, boolean isAccept) {
 		// 요청이 존재하는지 확인하고 가져옵니다.
 		UserRelationShip relationship = userRelationShipRepository.findById(requestId)
@@ -166,16 +171,16 @@ public class FriendService {
 	 * @param friendId 친구 ID
 	 * @return 삭제된 친구 정보
 	 */
+	@Transactional
 	public UserInfoDto deleteFriend(String userId, String friendId) {
 		UserRelationShip relationship = userRelationShipRepository
-			.findBySenderIdAndReceiverId(userId, friendId)
+			.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(userId, friendId,
+				friendId, userId)
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 친구입니다."));
 
 		userRelationShipRepository.delete(relationship);
-
 		User friend = relationship.getSender().getId().equals(userId) ? relationship.getReceiver() :
 			relationship.getSender();
 		return UserInfoDto.fromEntity(friend);
 	}
-
 }
