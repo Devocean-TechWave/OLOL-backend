@@ -29,35 +29,18 @@ class UserRelationShipRepositoryTest {
 	@DisplayName("유저간의 관계를 저장할 수 있다.")
 	void save() {
 		// given
-		User sender = User.builder()
-			.authType(AuthType.KAKAO)
-			.snsId("1234")
-			.build();
-		KakaoJoinRequest kakaoJoinRequest = new KakaoJoinRequest();
-		kakaoJoinRequest.setNickname("sender");
-		kakaoJoinRequest.setBirth(LocalDate.of(1994, 1, 1));
-		kakaoJoinRequest.setGender("male");
-		sender.setKakaoUser(kakaoJoinRequest);
-		userRepository.save(sender);
-		User receiver = User.builder()
-			.authType(AuthType.KAKAO)
-			.snsId("5678")
-			.build();
-		kakaoJoinRequest = new KakaoJoinRequest();
-		kakaoJoinRequest.setNickname("receiver");
-		kakaoJoinRequest.setBirth(LocalDate.of(1994, 1, 1));
-		kakaoJoinRequest.setGender("male");
-		receiver.setKakaoUser(kakaoJoinRequest);
-		userRepository.save(receiver);
+		User sender = createUser("sender", "1234");
+		User receiver = createUser("receiver", "5678");
 
 		UserRelationShip userRelationShip = UserRelationShip.builder()
 			.sender(sender)
 			.receiver(receiver)
 			.relationType(RelationType.CAT)
 			.build();
-		// when
 
+		// when
 		userRelationShipRepository.save(userRelationShip);
+
 		// then
 		UserRelationShip savedUserRelationShip = userRelationShipRepository.findById(userRelationShip.getId()).get();
 		Assertions.assertEquals(savedUserRelationShip.getId(), userRelationShip.getId());
@@ -75,14 +58,14 @@ class UserRelationShipRepositoryTest {
 
 		// then
 		Assertions.assertEquals(9, sentRequests.size());
-
 	}
 
 	@Test
 	@DisplayName("유저가 받은 친구 요청이 없을 때 오류가 나지 않는다.")
+	@Sql(scripts = {"/init-relation.sql"})
 	void findAllByReceiverId_Empty() {
 		// given
-		User receiver = userRepository.findById("1").orElseThrow();
+		User receiver = userRepository.findById("11").orElseThrow();
 
 		// when
 		List<UserRelationShip> receivedRequests = userRelationShipRepository.findAllByReceiverId(receiver.getId());
@@ -137,4 +120,60 @@ class UserRelationShipRepositoryTest {
 		Assertions.assertFalse(exists);
 	}
 
+	@Test
+	@DisplayName("유저 관계를 삭제할 수 있다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void deleteUserRelationShip() {
+		// given
+		User sender = userRepository.findById("1").orElseThrow();
+		User receiver = userRepository.findById("2").orElseThrow();
+
+		UserRelationShip relationship = userRelationShipRepository.findAllBySenderId(sender.getId()).get(0);
+
+		// when
+		userRelationShipRepository.delete(relationship);
+
+		// then
+		// 확인 1: 삭제된 엔티티가 더 이상 조회되지 않아야 한다.
+		Assertions.assertTrue(userRelationShipRepository.findById(relationship.getId()).isEmpty());
+
+		// 확인 2: 삭제된 엔티티가 existsBySenderAndReceiverAndRelationType에서도 제외되는지 확인
+		Assertions.assertFalse(
+			userRelationShipRepository.existsBySenderAndReceiverAndRelationType(sender, receiver, RelationType.FRIEND));
+	}
+
+	@Test
+	@DisplayName("유저 관계가 삭제된 후 더 이상 조회되지 않는다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findAllByReceiverId_AfterDelete() {
+		// given
+		User receiver = userRepository.findById("1").orElseThrow();
+		List<UserRelationShip> receivedRequests = userRelationShipRepository.findAllByReceiverId(receiver.getId());
+
+		UserRelationShip relationshipToDelete = receivedRequests.get(0);
+
+		// 관계 삭제
+		userRelationShipRepository.delete(relationshipToDelete);
+
+		// when
+		List<UserRelationShip> updatedReceivedRequests = userRelationShipRepository.findAllByReceiverId(
+			receiver.getId());
+
+		// then
+		Assertions.assertEquals(receivedRequests.size() - 1, updatedReceivedRequests.size());
+		Assertions.assertFalse(updatedReceivedRequests.contains(relationshipToDelete));
+	}
+
+	private User createUser(String nickname, String snsId) {
+		User user = User.builder()
+			.authType(AuthType.KAKAO)
+			.snsId(snsId)
+			.build();
+		KakaoJoinRequest kakaoJoinRequest = new KakaoJoinRequest();
+		kakaoJoinRequest.setNickname(nickname);
+		kakaoJoinRequest.setBirth(LocalDate.of(1994, 1, 1));
+		kakaoJoinRequest.setGender("male");
+		user.setKakaoUser(kakaoJoinRequest);
+		return userRepository.save(user);
+	}
 }
