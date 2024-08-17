@@ -88,8 +88,28 @@ public class FriendService {
 		return UserInfoDto.fromEntity(receiver);
 	}
 
-	public void cancelRequestFriend(String requestId) {
-		// TODO Auto-generated method stub
+	/**
+	 * 내가 보낸 친구 요청을 취소하는 메서드
+	 * @param userId 사용자 ID
+	 * @param requestId 요청 ID
+	 */
+	public void cancelRequestFriend(String userId, Long requestId) {
+		// 요청이 존재하는지 확인하고 가져옵니다.
+		UserRelationShip relationship = userRelationShipRepository.findById(requestId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 요청입니다."));
+
+		// 해당 요청이 현재 사용자의 요청인지 확인합니다.
+		if (!relationship.getSender().getId().equals(userId)) {
+			throw new IllegalStateException("다른 사용자의 요청을 취소할 수 없습니다.");
+		}
+
+		// 요청이 이미 취소된 경우 취소할 수 없도록 합니다.
+		if (relationship.isDelete()) {
+			throw new IllegalStateException("이미 취소된 요청입니다.");
+		}
+
+		// 요청을 논리적으로 삭제합니다.
+		userRelationShipRepository.delete(relationship);
 	}
 
 	public void responseFriend(String requestId) {
