@@ -407,8 +407,9 @@ class FriendServiceTest {
 			.build();
 
 		when(
-			userRelationShipRepository.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
-				"1", "2", "2", "1"))
+			userRelationShipRepository
+				.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
+					"1", "2", "2", "1"))
 			.thenReturn(Optional.of(relationship));
 
 		// Act
@@ -429,8 +430,9 @@ class FriendServiceTest {
 	void deleteFriend_FriendNotFound() {
 		// Arrange
 		when(
-			userRelationShipRepository.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
-				"1", "999", "999", "1"))
+			userRelationShipRepository
+				.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
+					"1", "999", "999", "1"))
 			.thenReturn(Optional.empty());
 
 		// Act & Assert

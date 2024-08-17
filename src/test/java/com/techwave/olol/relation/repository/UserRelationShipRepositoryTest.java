@@ -166,8 +166,9 @@ class UserRelationShipRepositoryTest {
 		userRelationShipRepository.delete(relationshipToDelete);
 
 		// when
-		List<UserRelationShip> updatedReceivedRequests = userRelationShipRepository.findAllByReceiverIdAndRelationStatus(
-			receiver.getId(), RelationStatus.REQUEST);
+		List<UserRelationShip> updatedReceivedRequests = userRelationShipRepository
+			.findAllByReceiverIdAndRelationStatus(
+				receiver.getId(), RelationStatus.REQUEST);
 
 		// then
 		Assertions.assertEquals(receivedRequests.size() - 1, updatedReceivedRequests.size());
@@ -226,9 +227,10 @@ class UserRelationShipRepositoryTest {
 		String receiverId = "2";
 
 		// when
-		Optional<UserRelationShip> relationship = userRelationShipRepository.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
-			senderId,
-			receiverId, receiverId, senderId);
+		Optional<UserRelationShip> relationship = userRelationShipRepository
+			.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
+				senderId,
+				receiverId, receiverId, senderId);
 
 		// then
 		Assertions.assertTrue(relationship.isPresent());
@@ -245,9 +247,10 @@ class UserRelationShipRepositoryTest {
 		String receiverId = "999"; // 존재하지 않는 사용자 ID
 
 		// when
-		Optional<UserRelationShip> relationship = userRelationShipRepository.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
-			senderId,
-			receiverId, receiverId, senderId);
+		Optional<UserRelationShip> relationship = userRelationShipRepository
+			.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
+				senderId,
+				receiverId, receiverId, senderId);
 
 		// then
 		Assertions.assertFalse(relationship.isPresent());
