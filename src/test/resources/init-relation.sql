@@ -1,4 +1,3 @@
--- 유저 생성
 INSERT INTO users (id, name, nickname, password, profile_url, birth, gender, auth_type, is_delete, sns_id)
 VALUES ('1', 'User1', 'sender1', 'password1', 'default_profile.PNG', '1990-01-01', 'MALE', 'KAKAO', false, 'snsId1'),
        ('2', 'User2', 'receiver1', 'password2', 'default_profile.PNG', '1991-01-01', 'MALE', 'KAKAO', false, 'snsId2'),
@@ -16,15 +15,15 @@ VALUES ('1', 'User1', 'sender1', 'password1', 'default_profile.PNG', '1990-01-01
 
 -- 유저 관계 생성 (User1이 나머지 9명의 유저에게 친구 요청을 보냄) + User2, User3이 User1에게 친구 요청을 보냄
 -- User1 -> User2, User3, User4, User5, User6, User7, User8, User9, User10
-INSERT INTO user_relationship (id, relation_type, is_delete, is_accept, giver_id, receiver_id)
-VALUES (1, 'FRIEND', false, false, '1', '2'),
-       (2, 'FRIEND', false, false, '1', '3'),
-       (3, 'FRIEND', false, false, '1', '4'),
-       (4, 'FRIEND', false, false, '1', '5'),
-       (5, 'FRIEND', false, false, '1', '6'),
-       (6, 'FRIEND', false, false, '1', '7'),
-       (7, 'FRIEND', false, false, '1', '8'),
-       (8, 'FRIEND', false, false, '1', '9'),
-       (9, 'FRIEND', false, false, '1', '10'),
-       (10, 'FRIEND', false, false, '2', '1'),
-       (11, 'FRIEND', false, false, '3', '1');
+INSERT INTO user_relationship (id, relation_type, is_delete, relation_status, giver_id, receiver_id)
+VALUES (1, 'FRIEND', false, 'REQUEST', '1', '2'),
+       (2, 'FRIEND', false, 'REQUEST', '1', '3'),
+       (3, 'FRIEND', false, 'REQUEST', '1', '4'),
+       (4, 'FRIEND', false, 'REQUEST', '1', '5'),
+       (5, 'FRIEND', false, 'REQUEST', '1', '6'),
+       (6, 'FRIEND', false, 'REQUEST', '1', '7'),
+       (7, 'FRIEND', false, 'REQUEST', '1', '8'),
+       (8, 'FRIEND', false, 'REQUEST', '1', '9'),
+       (9, 'FRIEND', false, 'REQUEST', '1', '10'),
+       (10, 'FRIEND', false, 'REQUEST', '2', '1'),
+       (11, 'FRIEND', false, 'REQUEST', '3', '1');
