@@ -2,6 +2,7 @@ package com.techwave.olol.relation.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -206,6 +207,40 @@ class UserRelationShipRepositoryTest {
 
 		// then
 		Assertions.assertEquals(0, relationships.size()); // 아무런 관계도 ACCEPT 상태가 아니므로 0이어야 합니다.
+	}
+
+	@Test
+	@DisplayName("발신자와 수신자 간의 관계를 조회할 수 있다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findBySenderIdAndReceiverId_Found() {
+		// given
+		String senderId = "1";
+		String receiverId = "2";
+
+		// when
+		Optional<UserRelationShip> relationship = userRelationShipRepository.findBySenderIdAndReceiverId(senderId,
+			receiverId);
+
+		// then
+		Assertions.assertTrue(relationship.isPresent());
+		Assertions.assertEquals(senderId, relationship.get().getSender().getId());
+		Assertions.assertEquals(receiverId, relationship.get().getReceiver().getId());
+	}
+
+	@Test
+	@DisplayName("발신자와 수신자 간의 관계가 없을 때 빈 Optional을 반환한다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findBySenderIdAndReceiverId_NotFound() {
+		// given
+		String senderId = "1";
+		String receiverId = "999"; // 존재하지 않는 사용자 ID
+
+		// when
+		Optional<UserRelationShip> relationship = userRelationShipRepository.findBySenderIdAndReceiverId(senderId,
+			receiverId);
+
+		// then
+		Assertions.assertFalse(relationship.isPresent());
 	}
 
 	private User createUser(String nickname, String snsId) {

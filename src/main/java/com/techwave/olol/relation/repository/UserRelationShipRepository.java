@@ -1,6 +1,7 @@
 package com.techwave.olol.relation.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -21,4 +22,6 @@ public interface UserRelationShipRepository extends JpaRepository<UserRelationSh
 	// 친구 요청을 보냈거나 받은 경우에서 RelationStatus가 ACCEPT인 경우만 가져오는 메서드
 	List<UserRelationShip> findAllBySenderIdAndRelationStatusOrReceiverIdAndRelationStatus(
 		String senderId, RelationStatus senderStatus, String receiverId, RelationStatus receiverStatus);
+
+	Optional<UserRelationShip> findBySenderIdAndReceiverId(String senderId, String receiverId);
 }
