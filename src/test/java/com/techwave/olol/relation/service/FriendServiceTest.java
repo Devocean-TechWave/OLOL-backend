@@ -36,6 +36,55 @@ class FriendServiceTest {
 	private UserRepository userRepository;
 
 	@Test
+	@DisplayName("친구 관계가 없는 경우 빈 리스트를 반환해야 한다.")
+	void getFriends_NoFriends() {
+		// Arrange
+		when(userRelationShipRepository.findAllBySenderIdAndRelationStatusOrReceiverIdAndRelationStatus(
+			anyString(), eq(RelationStatus.ACCEPT), anyString(), eq(RelationStatus.ACCEPT)))
+			.thenReturn(Collections.emptyList());
+
+		// Act
+		List<UserInfoDto> friends = friendService.getFriends("1");
+
+		// Assert
+		assertThat(friends).isEmpty();
+	}
+
+	@Test
+	@DisplayName("친구 관계가 있는 경우 올바른 친구 리스트를 반환해야 한다.")
+	void getFriends_WithFriends() {
+		// Arrange
+		User user1 = createMockUser("1", "John Doe", "johnd", "http://localhost:8080/profile.png");
+		User user2 = createMockUser("2", "Jane Doe", "janed", "http://localhost:8080/profile2.png");
+		User user3 = createMockUser("3", "Sam Smith", "sams", "http://localhost:8080/profile3.png");
+
+		UserRelationShip relationship1 = createMockRelationship(user1, user2, RelationStatus.ACCEPT);
+		UserRelationShip relationship2 = createMockRelationship(user3, user1, RelationStatus.ACCEPT);
+
+		when(userRelationShipRepository.findAllBySenderIdAndRelationStatusOrReceiverIdAndRelationStatus(
+			"1", RelationStatus.ACCEPT, "1", RelationStatus.ACCEPT))
+			.thenReturn(List.of(relationship1, relationship2));
+
+		// Act
+		List<UserInfoDto> friends = friendService.getFriends("1");
+
+		// Assert
+		assertThat(friends).hasSize(2);
+
+		// Verify first friend is user2
+		assertThat(friends.get(0).getId()).isEqualTo("2");
+		assertThat(friends.get(0).getName()).isEqualTo("Jane Doe");
+		assertThat(friends.get(0).getNickname()).isEqualTo("janed");
+		assertThat(friends.get(0).getProfileUrl()).isEqualTo("http://localhost:8080/profile2.png");
+
+		// Verify second friend is user3
+		assertThat(friends.get(1).getId()).isEqualTo("3");
+		assertThat(friends.get(1).getName()).isEqualTo("Sam Smith");
+		assertThat(friends.get(1).getNickname()).isEqualTo("sams");
+		assertThat(friends.get(1).getProfileUrl()).isEqualTo("http://localhost:8080/profile3.png");
+	}
+
+	@Test
 	@DisplayName("내가 보낸 친구 요청 목록이 비어있을 때 잘 가져올 수 있다.")
 	void getFriendRequestTest() {
 		// Arrange
@@ -370,6 +419,14 @@ class FriendServiceTest {
 			.sender(sender)
 			.receiver(receiver)
 			.relationType(RelationType.FRIEND)
+			.build();
+	}
+
+	private UserRelationShip createMockRelationship(User sender, User receiver, RelationStatus status) {
+		return UserRelationShip.builder()
+			.sender(sender)
+			.receiver(receiver)
+			.relationStatus(status)
 			.build();
 	}
 

@@ -1,6 +1,7 @@
 package com.techwave.olol.relation.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,24 @@ public class FriendService {
 
 	private final UserRelationShipRepository userRelationShipRepository;
 	private final UserRepository userRepository;
+
+	/**
+	 * 친구 목록을 가져옵니다.
+	 * @param userId 사용자 ID
+	 * @return 친구 목록
+	 */
+	public List<UserInfoDto> getFriends(String userId) {
+		List<UserRelationShip> relationships = userRelationShipRepository
+			.findAllBySenderIdAndRelationStatusOrReceiverIdAndRelationStatus(userId, RelationStatus.ACCEPT,
+				userId, RelationStatus.ACCEPT);
+		return relationships.stream()
+			.map(relationship -> {
+				User friend = relationship.getSender().getId().equals(userId) ? relationship.getReceiver() :
+					relationship.getSender();
+				return new UserInfoDto(friend.getId(), friend.getName(), friend.getNickname(), friend.getProfileUrl());
+			})
+			.collect(Collectors.toList());
+	}
 
 	/**
 	 * 내가 보낸 친구 요청 목록을 가져온다.
@@ -113,6 +132,13 @@ public class FriendService {
 		userRelationShipRepository.delete(relationship);
 	}
 
+	/**
+	 * 친구 요청에 대한 응답을 합니다.
+	 * 이미 수락된 요청에 대한 응답은 할 수 없습니다.
+	 * @param userId 사용자 ID
+	 * @param requestId 요청 ID
+	 * @param isAccept 수락 여부
+	 */
 	public void responseFriend(String userId, Long requestId, boolean isAccept) {
 		// 요청이 존재하는지 확인하고 가져옵니다.
 		UserRelationShip relationship = userRelationShipRepository.findById(requestId)
