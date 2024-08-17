@@ -12,7 +12,8 @@ VALUES ('1', 'User1', 'sender1', 'password1', 'default_profile.PNG', '1990-01-01
        ('10', 'User10', 'receiver9', 'password10', 'default_profile.PNG', '1999-01-01', 'MALE', 'KAKAO', false,
         'snsId10');
 
--- 유저 관계 생성 (User1이 나머지 9명의 유저에게 친구 요청을 보냄)
+-- 유저 관계 생성 (User1이 나머지 9명의 유저에게 친구 요청을 보냄) + User2, User3이 User1에게 친구 요청을 보냄
+-- User1 -> User2, User3, User4, User5, User6, User7, User8, User9, User10
 INSERT INTO user_relationship (id, relation_type, is_delete, is_accept, giver_id, receiver_id)
 VALUES (1, 'FRIEND', false, false, '1', '2'),
        (2, 'FRIEND', false, false, '1', '3'),
