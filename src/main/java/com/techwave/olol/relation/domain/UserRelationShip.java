@@ -2,6 +2,7 @@ package com.techwave.olol.relation.domain;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.user.domain.User;
 
 import jakarta.persistence.Column;
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class UserRelationShip {
+public class UserRelationShip extends BaseEntity {
 	@Id
 	@GeneratedValue
 	private Long id;

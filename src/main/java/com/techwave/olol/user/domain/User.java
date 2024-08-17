@@ -11,7 +11,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.techwave.olol.cheer.domain.Cheer;
 import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.login.constant.AuthType;
-import com.techwave.olol.mission.domain.Mission;
 import com.techwave.olol.relation.domain.UserRelationShip;
 import com.techwave.olol.user.dto.request.KakaoJoinRequest;
 
@@ -25,6 +24,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +34,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Entity(name = "users")
+@Builder
+@AllArgsConstructor
 public class User extends BaseEntity {
 
 	@Id
@@ -77,9 +79,11 @@ public class User extends BaseEntity {
 	private List<Cheer> cheers;
 
 	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
 	private Set<UserRelationShip> sentRequests = new HashSet<>();
 
 	@OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+	@Builder.Default
 	private Set<UserRelationShip> receivedRequests = new HashSet<>();
 
 	@Builder
