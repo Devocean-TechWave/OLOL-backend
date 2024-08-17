@@ -55,8 +55,8 @@ public class UserService {
 		if (user.getAuthType() != AuthType.KAKAO)
 			throw new ApiException(Error.AUTH_TYPE_MISMATCH);
 
-		if (!GenderType.MALE.getName().equalsIgnoreCase(request.getGender()) &&
-			!GenderType.FEMALE.getName().equalsIgnoreCase(request.getGender())) {
+		if (!GenderType.MALE.getName().equalsIgnoreCase(request.getGender())
+			&& !GenderType.FEMALE.getName().equalsIgnoreCase(request.getGender())) {
 			throw new ApiException(Error.INVALID_DATA);
 		}
 

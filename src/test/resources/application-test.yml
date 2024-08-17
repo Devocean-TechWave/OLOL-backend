@@ -31,16 +31,16 @@ jwt:
   refresh-token-duration: 2592000000
 
 # AWS 관련 설정
-aws:
-  s3:
-    bucket: TEST_BUCKET
-  credentials:
-    accessKey: TEST_ACCESS_KEY
-    secretKey: TEST_SECRET_KEY
-  region:
-    static: TEST_REGION
-  stack:
-    auto: false
+
+cloud:
+  aws:
+    credentials:
+      access-key: TEST_ACCESS_KEY
+      secret-key: TEST_SECRET_KEY
+    region:
+      static: TEST_REGION
+    bucket:
+      name: TEST_BUCKET
 logging:
   level:
     org:
@@ -49,3 +49,13 @@ logging:
         type:
           descriptor:
             sql: TRACE
+security:
+  whitelist:
+    - /api/v1/users/login/**
+    - /api/v1/users/check-nickname
+    - /images/**
+    - /swagger-ui/**
+    - /v3/api-docs/**
+    - /error
+    - /test/**
+    - /
