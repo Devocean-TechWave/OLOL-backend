@@ -136,7 +136,8 @@ class FriendServiceTest {
 		FriendReqListDto friendRequest = friendService.getSentFriendRequest("1");
 
 		// Assert
-		assertFriendRequestList(friendRequest, Collections.singletonList(relationship));
+		assertThat(friendRequest.getFriendReqList()).hasSize(1);
+		assertThat(friendRequest.getFriendReqList().get(0).getUserInfo().getId()).isEqualTo("2");
 	}
 
 	@Test
@@ -148,7 +149,8 @@ class FriendServiceTest {
 
 		when(userRepository.findUserById("1")).thenReturn(sender);
 		when(userRepository.findUserById("2")).thenReturn(receiver);
-		when(userRelationShipRepository.existsBySenderAndReceiverAndRelationType(sender, receiver, RelationType.FRIEND))
+		when(userRelationShipRepository.existsBySenderAndReceiverAndRelationTypeAndRelationStatus(sender, receiver,
+			RelationType.FRIEND, RelationStatus.REQUEST))
 			.thenReturn(false);
 
 		UserRelationShip relationship = UserRelationShip.builder()
@@ -175,7 +177,8 @@ class FriendServiceTest {
 
 		when(userRepository.findUserById("1")).thenReturn(sender);
 		when(userRepository.findUserById("2")).thenReturn(receiver);
-		when(userRelationShipRepository.existsBySenderAndReceiverAndRelationType(sender, receiver, RelationType.FRIEND))
+		when(userRelationShipRepository.existsBySenderAndReceiverAndRelationTypeAndRelationStatus(sender, receiver,
+			RelationType.FRIEND, RelationStatus.REQUEST))
 			.thenReturn(true);
 
 		// Act & Assert
@@ -403,7 +406,9 @@ class FriendServiceTest {
 			.relationStatus(RelationStatus.ACCEPT)
 			.build();
 
-		when(userRelationShipRepository.findBySenderIdAndReceiverId("1", "2"))
+		when(
+			userRelationShipRepository.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
+				"1", "2", "2", "1"))
 			.thenReturn(Optional.of(relationship));
 
 		// Act
@@ -423,7 +428,9 @@ class FriendServiceTest {
 	@DisplayName("존재하지 않는 친구를 삭제하려고 할 때 예외를 던진다.")
 	void deleteFriend_FriendNotFound() {
 		// Arrange
-		when(userRelationShipRepository.findBySenderIdAndReceiverId("1", "999"))
+		when(
+			userRelationShipRepository.findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
+				"1", "999", "999", "1"))
 			.thenReturn(Optional.empty());
 
 		// Act & Assert
@@ -437,9 +444,11 @@ class FriendServiceTest {
 	// 친구 요청을 Mocking하는 메소드
 	private void mockFriendRequestRepository(List<UserRelationShip> relationships, String userId, boolean isReceiver) {
 		if (isReceiver) {
-			when(userRelationShipRepository.findAllByReceiverId(userId)).thenReturn(relationships);
+			when(userRelationShipRepository.findAllByReceiverIdAndRelationStatus(userId,
+				RelationStatus.REQUEST)).thenReturn(relationships);
 		} else {
-			when(userRelationShipRepository.findAllBySenderId(userId)).thenReturn(relationships);
+			when(userRelationShipRepository.findAllBySenderIdAndRelationStatus(userId,
+				RelationStatus.REQUEST)).thenReturn(relationships);
 		}
 	}
 
