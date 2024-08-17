@@ -17,14 +17,25 @@ public class FriendService {
 	private final UserRelationShipRepository userRelationShipRepository;
 
 	public FriendReqListDto getFriendRequest(String userID) {
-		List<UserRelationShip> friendReq = userRelationShipRepository.findAllByReceiverId(userID);
+		return getFriendRequestByUserId(userID, true);
+	}
+
+	public FriendReqListDto getSentFriendRequest(String userID) {
+		return getFriendRequestByUserId(userID, false);
+	}
+
+	private FriendReqListDto getFriendRequestByUserId(String userID, boolean isReceiver) {
+		List<UserRelationShip> friendReq;
+
+		if (isReceiver) {
+			friendReq = userRelationShipRepository.findAllByReceiverId(userID);
+		} else {
+			friendReq = userRelationShipRepository.findAllBySenderId(userID);
+		}
+
 		FriendReqListDto friendReqListDto = new FriendReqListDto();
 		friendReqListDto.setByUserRelationList(friendReq);
 		return friendReqListDto;
-	}
-
-	public FriendReqListDto getSentFriendRequest() {
-		return new FriendReqListDto();
 	}
 
 	// public UserInfoDto requestFriend(String userId) {
