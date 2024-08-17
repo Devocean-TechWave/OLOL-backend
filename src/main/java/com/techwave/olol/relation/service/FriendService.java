@@ -61,6 +61,14 @@ public class FriendService {
 		return friendReqListDto;
 	}
 
+	/**
+	 * 친구 요청을 한다.
+	 * 친구 이미 요청이 있는 경우 예외를 발생시킨다.
+	 * @param senderId 보낸 사용자 ID (나)
+	 * @param receiverId 받는 사용자 ID (상대방)
+	 * @param relationType 친구 관계 타입
+	 * @return 친구 요청을 받은 사용자 정보
+	 */
 	@Transactional
 	public UserInfoDto requestFriend(String senderId, String receiverId, RelationType relationType) {
 		User sender = userRepository.findUserById(senderId);
@@ -75,7 +83,7 @@ public class FriendService {
 			.receiver(receiver)
 			.relationType(relationType)
 			.build();
-		
+
 		userRelationShipRepository.save(userRelationShip);
 		return UserInfoDto.fromEntity(receiver);
 	}
