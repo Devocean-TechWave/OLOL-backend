@@ -104,4 +104,37 @@ class UserRelationShipRepositoryTest {
 		// then
 		Assertions.assertEquals(2, receivedRequests.size());
 	}
+
+	@Test
+	@DisplayName("유저간의 요청이 이미 있을 때 true를 반환한다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void existsBySenderAndReceiverAndRelationType() {
+		// given
+		User sender = userRepository.findById("1").orElseThrow();
+		User receiver = userRepository.findById("2").orElseThrow();
+
+		// when
+		boolean exists = userRelationShipRepository.existsBySenderAndReceiverAndRelationType(sender, receiver,
+			RelationType.FRIEND);
+
+		// then
+		Assertions.assertTrue(exists);
+	}
+
+	@Test
+	@DisplayName("유저간의 요청이 없을 때 false를 반환한다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void existsBySenderAndReceiverAndRelationType_False() {
+		// given
+		User sender = userRepository.findById("1").orElseThrow();
+		User receiver = userRepository.findById("2").orElseThrow();
+
+		// when
+		boolean exists = userRelationShipRepository.existsBySenderAndReceiverAndRelationType(sender, receiver,
+			RelationType.CAT);
+
+		// then
+		Assertions.assertFalse(exists);
+	}
+
 }
