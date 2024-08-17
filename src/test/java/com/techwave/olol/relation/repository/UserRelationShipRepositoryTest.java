@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import com.techwave.olol.login.constant.AuthType;
+import com.techwave.olol.relation.domain.RelationStatus;
 import com.techwave.olol.relation.domain.RelationType;
 import com.techwave.olol.relation.domain.UserRelationShip;
 import com.techwave.olol.user.domain.User;
@@ -162,6 +163,49 @@ class UserRelationShipRepositoryTest {
 		// then
 		Assertions.assertEquals(receivedRequests.size() - 1, updatedReceivedRequests.size());
 		Assertions.assertFalse(updatedReceivedRequests.contains(relationshipToDelete));
+	}
+
+	@Test
+	@DisplayName("특정 유저가 보낸 요청과 받은 요청 중에서 ACCEPT 상태인 관계를 조회할 수 있다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findAllBySenderIdAndRelationStatusOrReceiverIdAndRelationStatus_Accepted() {
+		// given
+		// 스크립트에서 relationStatus가 'REQUEST'로 되어있으므로 테스트를 위해 일부 데이터를 'ACCEPT'로 변경합니다.
+		UserRelationShip relationship1 = userRelationShipRepository.findById(1L).orElseThrow();
+		relationship1.setRelationStatus(RelationStatus.ACCEPT);
+		userRelationShipRepository.save(relationship1);
+
+		UserRelationShip relationship2 = userRelationShipRepository.findById(10L).orElseThrow();
+		relationship2.setRelationStatus(RelationStatus.ACCEPT);
+		userRelationShipRepository.save(relationship2);
+
+		String userId = "1"; // User1에 대한 테스트
+
+		// when
+		List<UserRelationShip> relationships = userRelationShipRepository
+			.findAllBySenderIdAndRelationStatusOrReceiverIdAndRelationStatus(
+				userId, RelationStatus.ACCEPT, userId, RelationStatus.ACCEPT);
+
+		// then
+		Assertions.assertEquals(2, relationships.size()); // ACCEPT 상태인 2개의 관계가 조회되어야 합니다.
+		Assertions.assertTrue(relationships.stream()
+			.allMatch(rel -> rel.getRelationStatus() == RelationStatus.ACCEPT)); // 모든 관계가 ACCEPT 상태여야 합니다.
+	}
+
+	@Test
+	@DisplayName("ACCEPT 상태가 아닌 경우는 조회되지 않는다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findAllBySenderIdAndRelationStatusOrReceiverIdAndRelationStatus_NotAccepted() {
+		// given
+		String userId = "1"; // User1에 대한 테스트
+
+		// when
+		List<UserRelationShip> relationships = userRelationShipRepository
+			.findAllBySenderIdAndRelationStatusOrReceiverIdAndRelationStatus(
+				userId, RelationStatus.ACCEPT, userId, RelationStatus.ACCEPT);
+
+		// then
+		Assertions.assertEquals(0, relationships.size()); // 아무런 관계도 ACCEPT 상태가 아니므로 0이어야 합니다.
 	}
 
 	private User createUser(String nickname, String snsId) {
