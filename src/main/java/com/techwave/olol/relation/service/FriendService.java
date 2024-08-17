@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.techwave.olol.relation.domain.RelationStatus;
 import com.techwave.olol.relation.domain.RelationType;
 import com.techwave.olol.relation.domain.UserRelationShip;
 import com.techwave.olol.relation.dto.response.FriendReqListDto;
@@ -112,8 +113,25 @@ public class FriendService {
 		userRelationShipRepository.delete(relationship);
 	}
 
-	public void responseFriend(String requestId) {
-		// TODO Auto-generated method stub
+	public void responseFriend(String userId, Long requestId, boolean isAccept) {
+		// 요청이 존재하는지 확인하고 가져옵니다.
+		UserRelationShip relationship = userRelationShipRepository.findById(requestId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 요청입니다."));
+
+		// 해당 요청이 현재 사용자에게 온 요청인지 확인합니다.
+		if (!relationship.getReceiver().getId().equals(userId)) {
+			throw new IllegalStateException("다른 사용자의 요청에 대한 응답을 할 수 없습니다.");
+		}
+
+		// 요청이 이미 수락된 경우 수락할 수 없도록 합니다.
+		if (relationship.getRelationStatus() != RelationStatus.REQUEST) {
+			throw new IllegalStateException("이미 수락된 요청입니다.");
+		}
+
+		// 요청을 수락하거나 거절합니다.
+		relationship.setRelationStatus(isAccept ? RelationStatus.ACCEPT : RelationStatus.REJECT);
+		userRelationShipRepository.save(relationship);
+		//TODO: 여기서 유저한테 알림을 보내야 합니다.
 	}
 
 	// public UserInfoDto deleteFriend(String userId) {
