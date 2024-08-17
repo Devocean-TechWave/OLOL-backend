@@ -160,8 +160,22 @@ public class FriendService {
 		//TODO: 여기서 유저한테 알림을 보내야 합니다.
 	}
 
-	// public UserInfoDto deleteFriend(String userId) {
-	// 	return new UserInfoDto();
-	// }
+	/**
+	 * 친구를 삭제합니다.
+	 * @param userId 사용자 ID
+	 * @param friendId 친구 ID
+	 * @return 삭제된 친구 정보
+	 */
+	public UserInfoDto deleteFriend(String userId, String friendId) {
+		UserRelationShip relationship = userRelationShipRepository
+			.findBySenderIdAndReceiverId(userId, friendId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 친구입니다."));
+
+		userRelationShipRepository.delete(relationship);
+
+		User friend = relationship.getSender().getId().equals(userId) ? relationship.getReceiver() :
+			relationship.getSender();
+		return UserInfoDto.fromEntity(friend);
+	}
 
 }

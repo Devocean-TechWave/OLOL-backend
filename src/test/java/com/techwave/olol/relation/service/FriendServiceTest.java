@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -386,6 +387,51 @@ class FriendServiceTest {
 			.hasMessage("존재하지 않는 요청입니다.");
 
 		verify(userRelationShipRepository, never()).save(any(UserRelationShip.class));
+	}
+
+	@Test
+	@DisplayName("친구 삭제가 성공적으로 수행된다.")
+	void deleteFriend_Success() {
+		// Arrange
+		User user = createMockUser("1", "John Doe", "johndoe", "http://localhost:8080/profile.png");
+		User friend = createMockUser("2", "Jane Doe", "janedoe", "http://localhost:8080/profile2.png");
+
+		UserRelationShip relationship = UserRelationShip.builder()
+			.sender(user)
+			.receiver(friend)
+			.relationType(RelationType.FRIEND)
+			.relationStatus(RelationStatus.ACCEPT)
+			.build();
+
+		when(userRelationShipRepository.findBySenderIdAndReceiverId("1", "2"))
+			.thenReturn(Optional.of(relationship));
+
+		// Act
+		UserInfoDto result = friendService.deleteFriend("1", "2");
+
+		// Assert
+		assertThat(result).isNotNull();
+		assertThat(result.getId()).isEqualTo("2");
+		assertThat(result.getName()).isEqualTo("Jane Doe");
+		assertThat(result.getNickname()).isEqualTo("janedoe");
+		assertThat(result.getProfileUrl()).isEqualTo("http://localhost:8080/profile2.png");
+
+		verify(userRelationShipRepository, times(1)).delete(relationship);
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 친구를 삭제하려고 할 때 예외를 던진다.")
+	void deleteFriend_FriendNotFound() {
+		// Arrange
+		when(userRelationShipRepository.findBySenderIdAndReceiverId("1", "999"))
+			.thenReturn(Optional.empty());
+
+		// Act & Assert
+		assertThatThrownBy(() -> friendService.deleteFriend("1", "999"))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("존재하지 않는 친구입니다.");
+
+		verify(userRelationShipRepository, never()).delete(any(UserRelationShip.class));
 	}
 
 	// 친구 요청을 Mocking하는 메소드
