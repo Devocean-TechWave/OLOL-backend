@@ -1,6 +1,8 @@
 package com.techwave.olol.relation.domain;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.user.domain.User;
@@ -24,6 +26,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@SQLRestriction("is_delete = false")
+@SQLDelete(sql = "UPDATE user_relationship SET is_delete = true WHERE id = ?")
 public class UserRelationShip extends BaseEntity {
 	@Id
 	@GeneratedValue
