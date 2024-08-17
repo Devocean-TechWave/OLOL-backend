@@ -10,7 +10,9 @@ VALUES ('1', 'User1', 'sender1', 'password1', 'default_profile.PNG', '1990-01-01
        ('8', 'User8', 'receiver7', 'password8', 'default_profile.PNG', '1997-01-01', 'MALE', 'KAKAO', false, 'snsId8'),
        ('9', 'User9', 'receiver8', 'password9', 'default_profile.PNG', '1998-01-01', 'MALE', 'KAKAO', false, 'snsId9'),
        ('10', 'User10', 'receiver9', 'password10', 'default_profile.PNG', '1999-01-01', 'MALE', 'KAKAO', false,
-        'snsId10');
+        'snsId10'),
+       ('11', 'User11', 'receiver10', 'password11', 'default_profile.PNG', '2000-01-01', 'MALE', 'KAKAO', false,
+        'snsId11');
 
 -- 유저 관계 생성 (User1이 나머지 9명의 유저에게 친구 요청을 보냄) + User2, User3이 User1에게 친구 요청을 보냄
 -- User1 -> User2, User3, User4, User5, User6, User7, User8, User9, User10
