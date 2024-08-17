@@ -49,3 +49,13 @@ logging:
         type:
           descriptor:
             sql: TRACE
+security:
+  whitelist:
+    - /api/v1/users/login/**
+    - /api/v1/users/check-nickname
+    - /images/**
+    - /swagger-ui/**
+    - /v3/api-docs/**
+    - /error
+    - /test/**
+    - /
