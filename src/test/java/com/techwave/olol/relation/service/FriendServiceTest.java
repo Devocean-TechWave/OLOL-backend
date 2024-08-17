@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.techwave.olol.relation.domain.RelationStatus;
 import com.techwave.olol.relation.domain.RelationType;
 import com.techwave.olol.relation.domain.UserRelationShip;
 import com.techwave.olol.relation.dto.response.FriendReqDto;
@@ -222,6 +223,120 @@ class FriendServiceTest {
 
 		// verify that delete was not called
 		verify(userRelationShipRepository, never()).delete(any(UserRelationShip.class));
+	}
+
+	@Test
+	@DisplayName("친구 요청을 수락할 수 있다.")
+	void responseFriend_Accept_Success() {
+		// Arrange
+		User receiver = createMockUser("1", "John Doe", "johnd", "http://localhost:8080/profile.png");
+		User sender = createMockUser("2", "Jane Doe", "janed", "http://localhost:8080/profile2.png");
+
+		UserRelationShip relationship = UserRelationShip.builder()
+			.id(100L)
+			.sender(sender)
+			.receiver(receiver)
+			.relationType(RelationType.FRIEND)
+			.relationStatus(RelationStatus.REQUEST) // 요청 상태
+			.build();
+
+		when(userRelationShipRepository.findById(100L)).thenReturn(java.util.Optional.of(relationship));
+
+		// Act
+		friendService.responseFriend("1", 100L, true); // 요청 수락
+
+		// Assert
+		assertThat(relationship.getRelationStatus()).isEqualTo(RelationStatus.ACCEPT);
+		verify(userRelationShipRepository, times(1)).save(relationship);
+	}
+
+	@Test
+	@DisplayName("친구 요청을 거절할 수 있다.")
+	void responseFriend_Reject_Success() {
+		// Arrange
+		User receiver = createMockUser("1", "John Doe", "johnd", "http://localhost:8080/profile.png");
+		User sender = createMockUser("2", "Jane Doe", "janed", "http://localhost:8080/profile2.png");
+
+		UserRelationShip relationship = UserRelationShip.builder()
+			.id(100L)
+			.sender(sender)
+			.receiver(receiver)
+			.relationType(RelationType.FRIEND)
+			.relationStatus(RelationStatus.REQUEST) // 요청 상태
+			.build();
+
+		when(userRelationShipRepository.findById(100L)).thenReturn(java.util.Optional.of(relationship));
+
+		// Act
+		friendService.responseFriend("1", 100L, false); // 요청 거절
+
+		// Assert
+		assertThat(relationship.getRelationStatus()).isEqualTo(RelationStatus.REJECT);
+		verify(userRelationShipRepository, times(1)).save(relationship);
+	}
+
+	@Test
+	@DisplayName("다른 사용자의 친구 요청에 응답하려고 할 때 예외를 던진다.")
+	void responseFriend_UnauthorizedUser() {
+		// Arrange
+		User receiver = createMockUser("1", "John Doe", "johnd", "http://localhost:8080/profile.png");
+		User sender = createMockUser("2", "Jane Doe", "janed", "http://localhost:8080/profile2.png");
+
+		UserRelationShip relationship = UserRelationShip.builder()
+			.id(100L)
+			.sender(sender)
+			.receiver(receiver)
+			.relationType(RelationType.FRIEND)
+			.relationStatus(RelationStatus.REQUEST) // 요청 상태
+			.build();
+
+		when(userRelationShipRepository.findById(100L)).thenReturn(java.util.Optional.of(relationship));
+
+		// Act & Assert
+		assertThatThrownBy(() -> friendService.responseFriend("2", 100L, true))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessage("다른 사용자의 요청에 대한 응답을 할 수 없습니다.");
+
+		verify(userRelationShipRepository, never()).save(any(UserRelationShip.class));
+	}
+
+	@Test
+	@DisplayName("이미 수락된 요청에 다시 응답하려고 할 때 예외를 던진다.")
+	void responseFriend_AlreadyAccepted() {
+		// Arrange
+		User receiver = createMockUser("1", "John Doe", "johnd", "http://localhost:8080/profile.png");
+		User sender = createMockUser("2", "Jane Doe", "janed", "http://localhost:8080/profile2.png");
+
+		UserRelationShip relationship = UserRelationShip.builder()
+			.id(100L)
+			.sender(sender)
+			.receiver(receiver)
+			.relationType(RelationType.FRIEND)
+			.relationStatus(RelationStatus.ACCEPT) // 이미 수락된 상태
+			.build();
+
+		when(userRelationShipRepository.findById(100L)).thenReturn(java.util.Optional.of(relationship));
+
+		// Act & Assert
+		assertThatThrownBy(() -> friendService.responseFriend("1", 100L, true))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessage("이미 수락된 요청입니다.");
+
+		verify(userRelationShipRepository, never()).save(any(UserRelationShip.class));
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 요청에 응답하려고 할 때 예외를 던진다.")
+	void responseFriend_RequestNotFound() {
+		// Arrange
+		when(userRelationShipRepository.findById(100L)).thenReturn(java.util.Optional.empty());
+
+		// Act & Assert
+		assertThatThrownBy(() -> friendService.responseFriend("1", 100L, true))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("존재하지 않는 요청입니다.");
+
+		verify(userRelationShipRepository, never()).save(any(UserRelationShip.class));
 	}
 
 	// 친구 요청을 Mocking하는 메소드
