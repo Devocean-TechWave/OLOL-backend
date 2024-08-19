@@ -93,8 +93,8 @@ public class MissionServiceTest {
 	@DisplayName("미션 등록이 성공적으로 수행된다.")
 	void testRegisterMission() {
 		// given
-		when(userRepository.findByNickname("giverNickname")).thenReturn(Optional.of(giver));
-		when(userRepository.findByNickname("receiverNickname")).thenReturn(Optional.of(receiver));
+		when(userRepository.findById("giverNickname")).thenReturn(Optional.of(giver));
+		when(userRepository.findById("receiverNickname")).thenReturn(Optional.of(receiver));
 		when(missionRepository.save(any(Mission.class))).thenReturn(mission);
 
 		// when
@@ -111,7 +111,7 @@ public class MissionServiceTest {
 		List<Mission> missions = new ArrayList<>();
 		missions.add(mission);
 
-		when(userRepository.findByNickname("giverNickname")).thenReturn(Optional.of(giver));
+		when(userRepository.findById("giverNickname")).thenReturn(Optional.of(giver));
 		when(missionRepository.findProgressMissionsByGiver(giver)).thenReturn(missions);
 
 		// when
@@ -130,7 +130,7 @@ public class MissionServiceTest {
 		List<Mission> missions = new ArrayList<>();
 		missions.add(mission);
 
-		when(userRepository.findByNickname("giverNickname")).thenReturn(Optional.of(giver));
+		when(userRepository.findById("giverNickname")).thenReturn(Optional.of(giver));
 		when(missionRepository.findCompletedMissionsByGiver(giver)).thenReturn(missions);
 
 		// when
@@ -167,7 +167,7 @@ public class MissionServiceTest {
 	@DisplayName("이미지 저장을 포함한 미션 검증이 성공적으로 수행된다.")
 	void testVerifyMissionWithImageSave() throws IOException {
 		// given
-		when(userRepository.findByNickname("userNickname")).thenReturn(Optional.of(user));
+		when(userRepository.findById("userNickname")).thenReturn(Optional.of(user));
 		when(missionRepository.findById(mission.getId())).thenReturn(Optional.of(mission));
 
 		// mock AmazonS3 putObject method
@@ -180,12 +180,28 @@ public class MissionServiceTest {
 		missionService.verifyMission("userNickname", mission.getId(), multipartFile);
 
 		// then
-		verify(userRepository, times(1)).findByNickname("userNickname");
+		verify(userRepository, times(1)).findById("userNickname");
 		verify(missionRepository, times(1)).findById(mission.getId());
 		verify(amazonS3Client, times(1)).putObject(any(PutObjectRequest.class));
 		verify(amazonS3Client, times(1)).getUrl(eq(bucketName), anyString());
 		verify(successStampRepository, times(1)).save(any(SuccessStamp.class));  // SuccessStamp가 저장되었는지 확인
 		verify(missionRepository, times(1)).save(mission);
+	}
 
+	@Test
+	@DisplayName("미션 삭제가 성공적으로 수행된다.")
+	void testDeleteMission() {
+		// given
+		UUID missionId = UUID.randomUUID();
+		when(userRepository.findById("userNickname")).thenReturn(Optional.of(user));
+		when(missionRepository.findById(missionId)).thenReturn(Optional.of(mission));
+
+		// when
+		missionService.deleteMission("userNickname", missionId);
+
+		// then
+		verify(userRepository, times(1)).findById("userNickname");
+		verify(missionRepository, times(1)).findById(missionId);
+		verify(missionRepository, times(1)).save(mission);
 	}
 }
