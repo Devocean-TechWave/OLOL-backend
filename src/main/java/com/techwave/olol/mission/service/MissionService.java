@@ -106,6 +106,20 @@ public class MissionService {
 		missionRepository.save(mission);
 	}
 
+	public void deleteMission(String userId, UUID missionId) {
+		// 유저 조회
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
+
+		// 미션 조회
+		Mission mission = missionRepository.findById(missionId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 ID의 미션을 찾을 수 없습니다: " + missionId));
+
+		// 미션 삭제
+		mission.deleteMission();
+		missionRepository.save(mission);
+	}
+
 	// === 편의 메서드 ===
 	private void checkMission(ReqMissionDto reqMissionDto) {
 		// 미션 기간 확인

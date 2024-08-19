@@ -123,4 +123,9 @@ public class Mission {
 			.isImageRequired(request.isImageRequired())
 			.build();
 	}
+
+	// 삭제 메서드
+	public void deleteMission() {
+		this.isDeleted = true;
+	}
 }
