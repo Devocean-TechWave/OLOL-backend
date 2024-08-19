@@ -83,6 +83,17 @@ public class MissionService {
 
 	}
 
+	// 미션 상세 조회
+	public Mission getMissionDetail(String userId, UUID missionId) {
+		// 유저 조회
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
+
+		// 미션 조회
+		return missionRepository.findById(missionId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 ID의 미션을 찾을 수 없습니다: " + missionId));
+	}
+
 	public void registerMission(String userId, ReqMissionDto reqMissionDto) {
 		log.info("userNickname: {}", userId);
 		// 유저 조회

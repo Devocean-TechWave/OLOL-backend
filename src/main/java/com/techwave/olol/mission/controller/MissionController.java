@@ -72,6 +72,14 @@ public class MissionController {
 		return ResponseEntity.ok(missions);
 	}
 
+	// 미션 상세 조회
+	@GetMapping("/{missionId}")
+	public ResponseEntity<?> getMissionDetail(@AuthenticationPrincipal SecurityUser user,
+		@PathVariable UUID missionId) {
+		Mission mission = missionService.getMissionDetail(user.getUsername(), missionId);
+		return ResponseEntity.ok(mission);
+	}
+
 	// 미션 삭제
 	@DeleteMapping("/delete/{missionId}")
 	public ResponseEntity<String> deleteMission(@AuthenticationPrincipal SecurityUser user,

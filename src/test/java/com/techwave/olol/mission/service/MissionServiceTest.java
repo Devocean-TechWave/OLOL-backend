@@ -143,6 +143,24 @@ public class MissionServiceTest {
 	}
 
 	@Test
+	@DisplayName("미션 상세 조회가 성공적으로 수행된다.")
+	void testGetMissionDetail() {
+		// given
+		UUID missionId = UUID.randomUUID();
+		when(userRepository.findById("userNickname")).thenReturn(Optional.of(user));
+		when(missionRepository.findById(missionId)).thenReturn(Optional.of(mission));
+
+		// when
+		Mission result = missionService.getMissionDetail("userNickname", missionId);
+
+		// then
+		verify(userRepository, times(1)).findById("userNickname");
+		verify(missionRepository, times(1)).findById(missionId);
+		assertThat(result).isNotNull();
+		assertThat(result).isEqualTo(mission);
+	}
+
+	@Test
 	@DisplayName("미션 주차가 현재 주차보다 이전일 경우 예외가 발생한다.")
 	void testCheckMissionWeek() throws Exception {
 		// given
