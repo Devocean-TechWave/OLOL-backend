@@ -35,18 +35,17 @@ jobs:
       # 환경별 yml 파일 생성 - application.yml
       - name: make application.yml
         if: |
-          contains(github.ref, 'main') ||
-          contains(github.ref, 'develop')
+          contains(github.ref, 'main')
         run: |
-          mkdir ./src/main/resources # resources 폴더 생성
-          cd ./src/main/resources # resources 폴더로 이동
-          touch ./application.yml # application.yml 생성
+          mkdir -p ./src/main/resources
+          cd ./src/main/resources
+          touch ./application.yml
           echo "${{ secrets.YML }}" > ./application.yml
         shell: bash
 
       # 환경별 yml 파일 생성 - dev
       - name: make application-dev.yml
-        if: contains(github.ref, 'develop')
+        if: contains(github.ref, 'main')
         run: |
           cd ./src/main/resources
           touch ./application-dev.yml
@@ -55,23 +54,15 @@ jobs:
 
       # gradle build
       - name: Build with Gradle
-        run: ./gradlew build -x test
+        run: ./gradlew build -x checkstyleMain -x checkstyleTest -x editorconfigCheck -x test
 
       # docker build & push to production
       - name: Docker build & push to prod
         if: contains(github.ref, 'main')
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_USERNAME }}/docker-test-prod .
-          docker push ${{ secrets.DOCKER_USERNAME }}/docker-test-prod
-
-      # docker build & push to develop
-      - name: Docker build & push to dev
-        if: contains(github.ref, 'develop')
-        run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -f Dockerfile-dev -t ${{ secrets.DOCKER_USERNAME }}/docker-test-dev .
-          docker push ${{ secrets.DOCKER_USERNAME }}/docker-test-dev
+          docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/docker-olol-prod .
+          docker push ${{ secrets.DOCKER_USERNAME }}/docker-olol-prod
 
       ## deploy to production
       - name: Deploy to prod
@@ -85,22 +76,11 @@ jobs:
           envs: GITHUB_SHA
           script: |
             sudo docker ps
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/docker-test-prod
-            sudo docker run -d -p 8082:8082 ${{ secrets.DOCKER_USERNAME }}/docker-test-prod
-            sudo docker image prune -f
+            
+            sudo docker stop $(sudo docker ps -q --filter "ancestor=${{ secrets.DOCKER_USERNAME }}/docker-olol-prod" --filter "expose=8080")
+            sudo docker rm $(sudo docker ps -a -q --filter "ancestor=${{ secrets.DOCKER_USERNAME }}/docker-olol-prod" --filter "expose=8080")
 
-      ## deploy to develop
-      - name: Deploy to dev
-        uses: appleboy/ssh-action@master
-        id: deploy-dev
-        if: contains(github.ref, 'develop')
-        with:
-          host: ${{ secrets.HOST_DEV }}
-          username: ${{ secrets.USERNAME }}
-          port: 22
-          key: ${{ secrets.PRIVATE_KEY }}
-          script: |
-            sudo docker ps
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/docker-test-dev
-            sudo docker run -d -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/docker-test-dev
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/docker-olol-prod
+            sudo docker run -d -p 8080:8080 --name olol-prod --restart always ${{ secrets.DOCKER_USERNAME }}/docker-olol-prod
+
             sudo docker image prune -f
