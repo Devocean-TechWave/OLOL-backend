@@ -16,6 +16,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.techwave.olol.mission.domain.Mission;
 import com.techwave.olol.mission.domain.SuccessStamp;
 import com.techwave.olol.mission.dto.request.ReqMissionDto;
+import com.techwave.olol.mission.dto.response.RespMissionDto;
 import com.techwave.olol.mission.repository.MissionRepository;
 import com.techwave.olol.mission.repository.SuccessStampRepository;
 import com.techwave.olol.user.domain.User;
@@ -92,6 +93,29 @@ public class MissionService {
 		// 미션 조회
 		return missionRepository.findById(missionId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 ID의 미션을 찾을 수 없습니다: " + missionId));
+
+	}
+
+	// 메인 페이지 조회 - 진행중인 미션
+	public RespMissionDto getProcessMainPage(String userId) {
+		// 유저 조회
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
+		log.info("user: {}", user);
+
+		// 진행 중인 미션 조회 (내가 받은 미션)
+		List<Mission> receivedMissions = missionRepository.findProgressMissionsByReceiver(user);
+		log.info("receivedMissions: {}", receivedMissions);
+
+		// 진행 중인 미션 조회 (내가 보낸 미션)
+		List<Mission> givenMissions = missionRepository.findProgressMissionsByGiver(user);
+		log.info("givenMissions: {}", givenMissions);
+
+		// 미션 개수
+		int missionCount = receivedMissions.size();
+		log.info("missionCount: {}", missionCount);
+
+		return RespMissionDto.createRespMissionDto(missionCount, receivedMissions, givenMissions);
 	}
 
 	public void registerMission(String userId, ReqMissionDto reqMissionDto) {

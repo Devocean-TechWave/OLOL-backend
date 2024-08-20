@@ -31,6 +31,7 @@ import com.amazonaws.services.s3.model.PutObjectResult;
 import com.techwave.olol.mission.domain.Mission;
 import com.techwave.olol.mission.domain.SuccessStamp;
 import com.techwave.olol.mission.dto.request.ReqMissionDto;
+import com.techwave.olol.mission.dto.response.RespMissionDto;
 import com.techwave.olol.mission.repository.MissionRepository;
 import com.techwave.olol.mission.repository.SuccessStampRepository;
 import com.techwave.olol.user.domain.User;
@@ -222,4 +223,31 @@ public class MissionServiceTest {
 		verify(missionRepository, times(1)).findById(missionId);
 		verify(missionRepository, times(1)).save(mission);
 	}
+
+	// 메인 테스트 작성
+	@Test
+	@DisplayName("메인 페이지 조회 - 진행중인 미션이 성공적으로 수행된다.")
+	void testGetProcessMainPage() {
+		// given
+		when(userRepository.findById("userNickname")).thenReturn(Optional.of(user));
+		List<Mission> receivedMissions = new ArrayList<>();
+		receivedMissions.add(mission);
+		List<Mission> givenMissions = new ArrayList<>();
+		givenMissions.add(mission);
+		when(missionRepository.findProgressMissionsByReceiver(user)).thenReturn(receivedMissions);
+		when(missionRepository.findProgressMissionsByGiver(user)).thenReturn(givenMissions);
+
+		// when
+		RespMissionDto result = missionService.getProcessMainPage("userNickname");
+
+		// then
+		verify(userRepository, times(1)).findById("userNickname");
+		verify(missionRepository, times(1)).findProgressMissionsByReceiver(user);
+		verify(missionRepository, times(1)).findProgressMissionsByGiver(user);
+		assertThat(result).isNotNull();
+		assertThat(result.getMissionCnt()).isEqualTo(receivedMissions.size());
+		assertThat(result.getReceivedMissions()).hasSize(receivedMissions.size());
+		assertThat(result.getGivenMissions()).hasSize(givenMissions.size());
+	}
+
 }
