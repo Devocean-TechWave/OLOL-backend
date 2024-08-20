@@ -15,12 +15,14 @@ public class GivenMissionDto {
 	private final String emoji;
 	private final int successQuota;
 	private final String userName;
+	private final int successStampCount;
 
-	public GivenMissionDto(Mission mission, String emoji, int successQuota, String userName) {
+	public GivenMissionDto(Mission mission, String emoji, int successQuota, String userName, int successStampCount) {
 		this.id = mission.getId();
 		this.name = mission.getName();
 		this.emoji = emoji;
 		this.successQuota = successQuota;
 		this.userName = mission.getGiver().getName();
+		this.successStampCount = mission.getSuccessStamps().size();
 	}
 }

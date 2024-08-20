@@ -26,12 +26,12 @@ public class RespMissionDto {
 		List<Mission> givenMissions) {
 		List<ReceivedMissionDto> receivedMissionDtoList = receivedMissions.stream()
 			.map(mission -> new ReceivedMissionDto(mission, mission.getEmoji(), mission.getSuccessQuota(),
-				mission.getReceiver().getName()))
+				mission.getReceiver().getName(), mission.getSuccessStamps().size()))
 			.collect(Collectors.toList());
 
 		List<GivenMissionDto> givenMissionDtoList = givenMissions.stream()
 			.map(mission -> new GivenMissionDto(mission, mission.getEmoji(), mission.getSuccessQuota(),
-				mission.getGiver().getName()))
+				mission.getGiver().getName(), mission.getSuccessStamps().size()))
 			.collect(Collectors.toList());
 
 		return RespMissionDto.builder()

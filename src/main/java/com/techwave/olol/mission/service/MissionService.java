@@ -118,6 +118,24 @@ public class MissionService {
 		return RespMissionDto.createRespMissionDto(missionCount, receivedMissions, givenMissions);
 	}
 
+	// 메인 페이지 조회 - 완료한 미션
+	public RespMissionDto getCompletedMainPage(String userId) {
+		// 유저 조회
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
+
+		// 완료된 미션 조회 (내가 받은 미션)
+		List<Mission> receivedMissions = missionRepository.findCompletedMissionsByReceiver(user);
+
+		// 완료된 미션 조회 (내가 보낸 미션)
+		List<Mission> givenMissions = missionRepository.findCompletedMissionsByGiver(user);
+
+		// 미션 개수
+		int missionCount = receivedMissions.size();
+
+		return RespMissionDto.createRespMissionDto(missionCount, receivedMissions, givenMissions);
+	}
+
 	public void registerMission(String userId, ReqMissionDto reqMissionDto) {
 		log.info("userNickname: {}", userId);
 		// 유저 조회

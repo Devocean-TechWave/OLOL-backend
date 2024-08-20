@@ -74,9 +74,16 @@ public class MissionController {
 	}
 
 	// 메인 페이지 조회 - 진행중인 미션
-	@GetMapping("/main")
+	@GetMapping("/main/progress")
 	public ResponseEntity<?> getMainPage(@AuthenticationPrincipal SecurityUser user) {
 		RespMissionDto missions = missionService.getProcessMainPage(user.getUsername());
+		return ResponseEntity.ok(missions);
+	}
+
+	// 메인 페이지 조회 - 완료한 미션
+	@GetMapping("/main/completed")
+	public ResponseEntity<?> getCompletedMainPage(@AuthenticationPrincipal SecurityUser user) {
+		RespMissionDto missions = missionService.getCompletedMainPage(user.getUsername());
 		return ResponseEntity.ok(missions);
 	}
 

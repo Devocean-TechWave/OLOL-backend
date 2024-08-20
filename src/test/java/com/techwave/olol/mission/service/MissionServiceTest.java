@@ -250,4 +250,29 @@ public class MissionServiceTest {
 		assertThat(result.getGivenMissions()).hasSize(givenMissions.size());
 	}
 
+	@Test
+	@DisplayName("메인 페이지 조회 - 완료한 미션이 성공적으로 수행된다.")
+	void testGetCompletedMainPage() {
+		// given
+		when(userRepository.findById("userNickname")).thenReturn(Optional.of(user));
+		List<Mission> receivedMissions = new ArrayList<>();
+		receivedMissions.add(mission);
+		List<Mission> givenMissions = new ArrayList<>();
+		givenMissions.add(mission);
+		when(missionRepository.findCompletedMissionsByReceiver(user)).thenReturn(receivedMissions);
+		when(missionRepository.findCompletedMissionsByGiver(user)).thenReturn(givenMissions);
+
+		// when
+		RespMissionDto result = missionService.getCompletedMainPage("userNickname");
+
+		// then
+		verify(userRepository, times(1)).findById("userNickname");
+		verify(missionRepository, times(1)).findCompletedMissionsByReceiver(user);
+		verify(missionRepository, times(1)).findCompletedMissionsByGiver(user);
+		assertThat(result).isNotNull();
+		assertThat(result.getMissionCnt()).isEqualTo(receivedMissions.size());
+		assertThat(result.getReceivedMissions()).hasSize(receivedMissions.size());
+		assertThat(result.getGivenMissions()).hasSize(givenMissions.size());
+	}
+
 }
