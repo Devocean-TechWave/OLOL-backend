@@ -1,6 +1,5 @@
-name: CI/CD using github actions & docker
+name: CI/CD using Github Actions & AWS CodeDeploy
 
-# event trigger
 on:
   push:
     branches: [ "main" ]
@@ -9,10 +8,10 @@ permissions:
   contents: read
 
 jobs:
-  CI-CD:
+  build:
     runs-on: ubuntu-latest
-    steps:
 
+    steps:
       # JDK setting
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -43,44 +42,39 @@ jobs:
           echo "${{ secrets.YML }}" > ./application.yml
         shell: bash
 
-      # 환경별 yml 파일 생성 - dev
-      - name: make application-dev.yml
+      # 환경별 yml 파일 생성 - prod
+      - name: make application-prod.yml
         if: contains(github.ref, 'main')
         run: |
           cd ./src/main/resources
-          touch ./application-dev.yml
-          echo "${{ secrets.YML_DEV }}" > ./application-dev.yml
+          touch ./application-prod.yml
+          echo "${{ secrets.YML_PROD }}" > ./application-prod.yml
         shell: bash
 
       # gradle build
       - name: Build with Gradle
         run: ./gradlew build -x checkstyleMain -x checkstyleTest -x editorconfigCheck -x test
 
-      # docker build & push to production
-      - name: Docker build & push to prod
-        if: contains(github.ref, 'main')
-        run: |
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker build -f Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/docker-olol-prod .
-          docker push ${{ secrets.DOCKER_USERNAME }}/docker-olol-prod
+      # make zip file
+      - name: Make zip file
+        run: zip -qq -r ./$GITHUB_SHA.zip .
+        shell: bash
 
-      ## deploy to production
-      - name: Deploy to prod
-        uses: appleboy/ssh-action@master
-        id: deploy-prod
-        if: contains(github.ref, 'main')
+      # AWS 사용자 정보 입력
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          host: ${{ secrets.HOST_PROD }}
-          username: ubuntu
-          key: ${{ secrets.PRIVATE_KEY }}
-          envs: GITHUB_SHA
-          script: |
-            sudo docker ps
-            
-            sudo docker stop $(sudo docker ps -q --filter "ancestor=${{ secrets.DOCKER_USERNAME }}/docker-olol-prod" --filter "expose=8080")
-            sudo docker rm $(sudo docker ps -a -q --filter "ancestor=${{ secrets.DOCKER_USERNAME }}/docker-olol-prod" --filter "expose=8080")
+          aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.ACCESS_KEY_SECRET }}
+          aws-region: ap-northeast-2
 
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/docker-olol-prod
-            sudo docker run -d -p 8080:8080 --name olol-prod --restart always ${{ secrets.DOCKER_USERNAME }}/docker-olol-prod
+      # S3에 zip 파일 업로드
+      - name: Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://${{ secrets.S3_BUCKET_NAME }}/deploy/$GITHUB_SHA.zip --source .
 
-            sudo docker image prune -f
+      # CodeDeploy에 배포 요청
+      - name: Code Deploy
+        run: aws deploy create-deployment --application-name ${{ secrets.CODE_DEPLOY_APP_NAME }}
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name ${{ secrets.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }}
+          --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=deploy/$GITHUB_SHA.zip
