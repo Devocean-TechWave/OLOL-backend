@@ -1,6 +1,3 @@
-spring:
-  profiles:
-    active: dev
 springdoc:
   packages-to-scan: com.techwave.olol
   default-consumes-media-type: application/json;charset=UTF-8
@@ -10,4 +7,11 @@ springdoc:
     disable-swagger-default-url: true
     display-request-duration: true
     operations-sorter: alpha
-
+---
+spring:
+  profiles:
+    active: dev
+---
+spring:
+  profiles:
+    active: prod
