@@ -1,7 +1,7 @@
 REPOSITORY=/home/ubuntu/app
 cd $REPOSITORY
 
-APP_NAME=demo
+APP_NAME=olol
 JAR_NAME=$(ls $REPOSITORY/build/libs/ | grep '.jar' | tail -n 1)
 JAR_PATH=$REPOSITORY/build/libs/$JAR_NAME
 
@@ -18,5 +18,5 @@ fi
 
 echo "> $JAR_PATH 배포" #3
 nohup java -jar \
-        -Dspring.profiles.active=dev \
+        -Dspring.profiles.active=prod \
         build/libs/$JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
