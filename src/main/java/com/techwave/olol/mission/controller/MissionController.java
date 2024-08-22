@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.techwave.olol.mission.domain.Mission;
 import com.techwave.olol.mission.dto.request.ReqMissionDto;
+import com.techwave.olol.mission.dto.response.RespMissionDto;
 import com.techwave.olol.mission.service.MissionService;
 import com.techwave.olol.user.dto.SecurityUser;
 
@@ -70,6 +71,28 @@ public class MissionController {
 		@RequestParam boolean active) {
 		List<Mission> missions = missionService.getMissions(user.getUsername(), active, true);
 		return ResponseEntity.ok(missions);
+	}
+
+	// 메인 페이지 조회 - 진행중인 미션
+	@GetMapping("/main/progress")
+	public ResponseEntity<?> getMainPage(@AuthenticationPrincipal SecurityUser user) {
+		RespMissionDto missions = missionService.getProcessMainPage(user.getUsername());
+		return ResponseEntity.ok(missions);
+	}
+
+	// 메인 페이지 조회 - 완료한 미션
+	@GetMapping("/main/completed")
+	public ResponseEntity<?> getCompletedMainPage(@AuthenticationPrincipal SecurityUser user) {
+		RespMissionDto missions = missionService.getCompletedMainPage(user.getUsername());
+		return ResponseEntity.ok(missions);
+	}
+
+	// 미션 상세 조회
+	@GetMapping("/{missionId}")
+	public ResponseEntity<?> getMissionDetail(@AuthenticationPrincipal SecurityUser user,
+		@PathVariable UUID missionId) {
+		Mission mission = missionService.getMissionDetail(user.getUsername(), missionId);
+		return ResponseEntity.ok(mission);
 	}
 
 	// 미션 삭제
