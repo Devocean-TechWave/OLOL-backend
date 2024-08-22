@@ -15,8 +15,9 @@ import com.techwave.olol.login.constant.AuthType;
 import com.techwave.olol.relation.domain.RelationStatus;
 import com.techwave.olol.relation.domain.RelationType;
 import com.techwave.olol.relation.domain.UserRelationShip;
+import com.techwave.olol.user.domain.GenderType;
 import com.techwave.olol.user.domain.User;
-import com.techwave.olol.user.dto.request.KakaoJoinRequest;
+import com.techwave.olol.user.dto.request.KakaoJoinRequestDto;
 import com.techwave.olol.user.repository.UserRepository;
 
 @DataJpaTest
@@ -261,11 +262,11 @@ class UserRelationShipRepositoryTest {
 			.authType(AuthType.KAKAO)
 			.snsId(snsId)
 			.build();
-		KakaoJoinRequest kakaoJoinRequest = new KakaoJoinRequest();
-		kakaoJoinRequest.setNickname(nickname);
-		kakaoJoinRequest.setBirth(LocalDate.of(1994, 1, 1));
-		kakaoJoinRequest.setGender("male");
-		user.setKakaoUser(kakaoJoinRequest);
+		KakaoJoinRequestDto kakaoJoinRequestDto = new KakaoJoinRequestDto();
+		kakaoJoinRequestDto.setNickname(nickname);
+		kakaoJoinRequestDto.setBirth(LocalDate.of(1994, 1, 1));
+		kakaoJoinRequestDto.setGender(GenderType.MALE);
+		user.setKakaoUser(kakaoJoinRequestDto);
 		return userRepository.save(user);
 	}
 }
