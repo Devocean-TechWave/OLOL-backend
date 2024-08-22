@@ -1,7 +1,10 @@
 package com.techwave.olol.relation.domain;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
+import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.user.domain.User;
 
 import jakarta.persistence.Column;
@@ -18,12 +21,15 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Table(name = "user_relationship")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class UserRelationShip {
+@SQLRestriction("is_delete = false")
+@SQLDelete(sql = "UPDATE user_relationship SET is_delete = true WHERE id = ?")
+public class UserRelationShip extends BaseEntity {
 	@Id
 	@GeneratedValue
 	private Long id;
@@ -36,9 +42,11 @@ public class UserRelationShip {
 	@ColumnDefault("false")
 	private boolean isDelete;
 
-	@Column(name = "is_accept", nullable = false)
-	@ColumnDefault("false")
-	private boolean isAccept;
+	@Column(name = "relation_status", nullable = false)
+	@ColumnDefault("'REQUEST'")
+	@Enumerated(EnumType.STRING)
+	@Setter
+	private RelationStatus relationStatus;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "giver_id")
@@ -49,10 +57,15 @@ public class UserRelationShip {
 	private User receiver;
 
 	@Builder
-	public UserRelationShip(User sender, User receiver, RelationType relationType) {
+	public UserRelationShip(Long id, User sender, User receiver, RelationType relationType,
+		RelationStatus relationStatus,
+		boolean isDelete) {
+		this.id = id;
 		this.sender = sender;
 		this.receiver = receiver;
 		this.relationType = relationType;
+		this.relationStatus = relationStatus;
+		this.isDelete = isDelete;
 		sender.addSenderRelationShip(this);
 		receiver.addReceiverRelationShip(this);
 	}

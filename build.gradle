@@ -30,7 +30,7 @@ java {
     }
 }
 
-configurations {//
+configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
@@ -68,7 +68,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    //swagger
+    // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
     // S3
@@ -85,9 +85,15 @@ dependencies {
     testImplementation('org.junit.jupiter:junit-jupiter')
     testImplementation('org.junit.jupiter:junit-jupiter-api')
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine')
+    testImplementation 'org.springframework.security:spring-security-test'
     implementation 'mysql:mysql-connector-java:8.0.28'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// commons-logging 라이브러리 충돌 방지
+configurations.all {
+    exclude group: 'commons-logging', module: 'commons-logging'
 }
