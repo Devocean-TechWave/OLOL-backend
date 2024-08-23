@@ -1,10 +1,13 @@
 package com.techwave.olol.relation.domain;
 
+import java.util.List;
+
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import com.techwave.olol.global.jpa.BaseEntity;
+import com.techwave.olol.notification.domain.Poke;
 import com.techwave.olol.user.domain.User;
 
 import jakarta.persistence.Column;
@@ -16,6 +19,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -55,6 +59,9 @@ public class UserRelationShip extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "receiver_id")
 	private User receiver;
+
+	@OneToMany(mappedBy = "userRelationShip")
+	List<Poke> pokes;
 
 	@Builder
 	public UserRelationShip(Long id, User sender, User receiver, RelationType relationType,
