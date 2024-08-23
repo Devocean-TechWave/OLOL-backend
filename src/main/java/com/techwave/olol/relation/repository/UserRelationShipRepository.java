@@ -27,4 +27,7 @@ public interface UserRelationShipRepository extends JpaRepository<UserRelationSh
 	Optional<UserRelationShip> findAllBySenderIdAndReceiverIdAndIsDeleteFalseOrReceiverIdAndSenderIdAndIsDeleteFalse(
 		String senderId, String receiverId, String receiverId2, String senderId2);
 
+	List<UserRelationShip> findTop10ByReceiverIdAndRelationStatus(String receiverId, RelationStatus relationStatus);
+
+	List<UserRelationShip> findTop10BySenderIdAndRelationStatus(String senderId, RelationStatus relationStatus);
 }

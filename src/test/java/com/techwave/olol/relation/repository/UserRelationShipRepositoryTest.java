@@ -257,6 +257,70 @@ class UserRelationShipRepositoryTest {
 		Assertions.assertFalse(relationship.isPresent());
 	}
 
+	@Test
+	@DisplayName("받은 친구 요청을 최신순으로 10개 조회할 수 있다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findTop10ByReceiverIdAndRelationStatus() {
+		// given
+		String receiverId = "1";
+
+		// when
+		List<UserRelationShip> receivedRequests = userRelationShipRepository.findTop10ByReceiverIdAndRelationStatus(
+			receiverId, RelationStatus.REQUEST);
+
+		// then
+		Assertions.assertEquals(2, receivedRequests.size());
+		Assertions.assertEquals("2", receivedRequests.get(0).getSender().getId());
+		Assertions.assertEquals("3", receivedRequests.get(1).getSender().getId());
+	}
+
+	@Test
+	@DisplayName("보낸 친구 요청을 최신순으로 10개 조회할 수 있다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findTop10BySenderIdAndRelationStatus() {
+		// given
+		String senderId = "1";
+
+		// when
+		List<UserRelationShip> sentRequests = userRelationShipRepository.findTop10BySenderIdAndRelationStatus(
+			senderId, RelationStatus.REQUEST);
+
+		// then
+		Assertions.assertEquals(9, sentRequests.size());
+		Assertions.assertEquals("2", sentRequests.get(0).getReceiver().getId());
+		Assertions.assertEquals("3", sentRequests.get(1).getReceiver().getId());
+	}
+
+	@Test
+	@DisplayName("받은 친구 요청이 없을 때 빈 리스트를 반환한다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findTop10ByReceiverIdAndRelationStatus_Empty() {
+		// given
+		String receiverId = "11"; // 존재하지 않는 사용자 ID
+
+		// when
+		List<UserRelationShip> receivedRequests = userRelationShipRepository.findTop10ByReceiverIdAndRelationStatus(
+			receiverId, RelationStatus.REQUEST);
+
+		// then
+		Assertions.assertTrue(receivedRequests.isEmpty());
+	}
+
+	@Test
+	@DisplayName("보낸 친구 요청이 없을 때 빈 리스트를 반환한다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findTop10BySenderIdAndRelationStatus_Empty() {
+		// given
+		String senderId = "11"; // 존재하지 않는 사용자 ID
+
+		// when
+		List<UserRelationShip> sentRequests = userRelationShipRepository.findTop10BySenderIdAndRelationStatus(
+			senderId, RelationStatus.REQUEST);
+
+		// then
+		Assertions.assertTrue(sentRequests.isEmpty());
+	}
+
 	private User createUser(String nickname, String snsId) {
 		User user = User.builder()
 			.authType(AuthType.KAKAO)
@@ -269,4 +333,5 @@ class UserRelationShipRepositoryTest {
 		user.setKakaoUser(kakaoJoinRequestDto);
 		return userRepository.save(user);
 	}
+
 }
