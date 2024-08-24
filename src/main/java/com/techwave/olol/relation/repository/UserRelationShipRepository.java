@@ -49,7 +49,7 @@ public interface UserRelationShipRepository extends JpaRepository<UserRelationSh
 		@Param("status") RelationStatus status);
 
 	@Query("SELECT ur FROM UserRelationShip ur WHERE " +
-		"(ur.sender.id = :userId OR ur.receiver.id = :userId1) AND " +
+		"ur.sender.id = :userId AND " +
 		"ur.relationStatus = :status AND ur.isDelete = false")
 	List<UserRelationShip> findAllAcceptedRelationByUserId(
 		@Param("userId") String userId,

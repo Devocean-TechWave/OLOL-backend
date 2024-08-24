@@ -83,3 +83,36 @@ VALUES (X'123E4567E89B12D3A456426614174000', '2021-01-01', '2021-12-31', 'Missio
         false, '2', '3'),
        (X'123E4567E89B12D3A456426614174002', '2024-01-01', '2024-08-31', 'Mission3', '🎉', '1000', 10, false, false,
         false, '3', '4');
+
+-- Inserting additional users to cover more test cases.
+
+INSERT INTO users (id, name, nickname, profile_url, birth, gender, auth_type, is_delete, sns_id, one_signal_id)
+VALUES ('21', 'User21', 'nick21', 'profile21.png', '2010-01-01', 'MALE', 'KAKAO', false, 'sns21', 'signal21'),
+       ('22', 'User22', 'nick22', 'profile22.png', '2011-01-01', 'FEMALE', 'KAKAO', false, 'sns22', 'signal22');
+
+-- Friend requests for testing notifications.
+INSERT INTO user_relationship (id, relation_type, is_delete, relation_status, giver_id, receiver_id)
+VALUES (21, 'FRIEND', false, 'REQUEST', '1', '3'), -- User1 sent a friend request to User3
+       (22, 'FRIEND', false, 'REQUEST', '2', '4'), -- User2 sent a friend request to User4
+       (23, 'FRIEND', false, 'ACCEPT', '3', '1'),  -- User3 accepted User1's friend request
+       (24, 'FRIEND', false, 'REJECT', '4', '2');
+-- User4 rejected User2's friend request
+
+-- Inserting missions for testing cheer notifications.
+INSERT INTO mission (id, start_at, end_at, name, emoji, reward, success_quota, is_success, is_image_required, is_delete,
+                     giver_id, receiver_id)
+VALUES (X'123E4567E89B12D3A456426614174003', '2024-01-01', '2024-08-31', 'Mission4', '🎉', '1000', 10, false, false,
+        false, '1', '3'),
+       (X'123E4567E89B12D3A456426614174004', '2024-01-01', '2024-08-31', 'Mission5', '🎉', '1000', 10, false, false,
+        false, '2', '4');
+
+-- Insert cheers associated with missions.
+INSERT INTO user_mission_cheer (id, type, giver_id, mission_id)
+VALUES (1, 'LIKE', '2', X'123E4567E89B12D3A456426614174003'), -- User2 likes Mission4 of User1
+       (2, 'LOVE', '4', X'123E4567E89B12D3A456426614174004');
+-- User4 loves Mission5 of User2
+
+-- Inserting pokes for testing poke notifications.
+INSERT INTO poke (id, date, user_relation_ship_id)
+VALUES (1, '2024-08-01', 23), -- Poke from User3 to User1 in an accepted friend relationship
+       (2, '2024-08-02', 24); -- Poke from User4 to User2 in a rejected friend relationship
