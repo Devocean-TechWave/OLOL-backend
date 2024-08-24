@@ -1,5 +1,6 @@
 package com.techwave.olol.cheer.controller;
 
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -8,10 +9,12 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,9 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.techwave.olol.cheer.domain.Cheer;
 import com.techwave.olol.cheer.domain.CheerType;
 import com.techwave.olol.cheer.dto.CheerRequestDto;
 import com.techwave.olol.global.WithMockCustomUser;
+import com.techwave.olol.notification.service.NotificationService;
+import com.techwave.olol.user.domain.User;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,9 +46,17 @@ public class CheerControllerTest {
 	@Autowired
 	private WebApplicationContext context;
 
+	@MockBean
+	private NotificationService notificationService;
+
 	@BeforeEach
 	public void setup() {
+		MockitoAnnotations.openMocks(this); // Mockito 애노테이션 초기화
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context).build();
+
+		// Mock 설정: sendNotification 메서드가 호출되면 아무 것도 하지 않도록 설정
+		doNothing().when(notificationService).sendNotification(any(), any(), any());
+		doNothing().when(notificationService).sendNotification(any(Cheer.class), any(User.class));
 	}
 
 	@Test
@@ -85,5 +99,5 @@ public class CheerControllerTest {
 			.andExpect(jsonPath("$.id").value(userId))
 			.andExpect(jsonPath("$.name").isNotEmpty());
 	}
-	
+
 }
