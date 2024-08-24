@@ -9,6 +9,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import com.techwave.olol.cheer.domain.Cheer;
 import com.techwave.olol.mission.dto.request.ReqMissionDto;
 import com.techwave.olol.user.domain.User;
 
@@ -90,6 +91,10 @@ public class Mission {
 	@Builder.Default
 	@OneToMany(mappedBy = "mission")
 	private List<SuccessStamp> successStamps = new ArrayList<>();
+
+	@Builder.Default
+	@OneToMany(mappedBy = "mission")
+	private List<Cheer> cheers = new ArrayList<>();
 
 	public void setGiver(User giver) {
 		this.giver = giver;
