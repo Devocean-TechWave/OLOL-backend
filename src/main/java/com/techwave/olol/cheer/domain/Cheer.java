@@ -1,10 +1,14 @@
 package com.techwave.olol.cheer.domain;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.mission.domain.Mission;
 import com.techwave.olol.user.domain.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -23,9 +27,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Cheer {
+public class Cheer extends BaseEntity {
 	@Id
 	@GeneratedValue
 	private Long id;
@@ -33,10 +38,10 @@ public class Cheer {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false)
 	private CheerType cheerType;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "giver_id")
-	private User cheerGiver;
+	private User giver;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "mission_id")

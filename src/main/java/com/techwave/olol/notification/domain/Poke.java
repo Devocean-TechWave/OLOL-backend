@@ -2,10 +2,14 @@ package com.techwave.olol.notification.domain;
 
 import java.time.LocalDate;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.relation.domain.UserRelationShip;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -23,7 +27,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @Getter
-public class Poke {
+@EntityListeners(AuditingEntityListener.class)
+public class Poke extends BaseEntity {
 	@Id
 	@GeneratedValue
 	private Long id;

@@ -79,7 +79,7 @@ public class User extends BaseEntity {
 	@Column(name = "one_signal_id")
 	private String oneSignalId;
 
-	@OneToMany(mappedBy = "cheerGiver", orphanRemoval = true)
+	@OneToMany(mappedBy = "giver", orphanRemoval = true)
 	private List<Cheer> cheers = new ArrayList<>();
 
 	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
