@@ -1,5 +1,7 @@
 package com.techwave.olol.relation.repository;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -319,6 +321,25 @@ class UserRelationShipRepositoryTest {
 
 		// then
 		Assertions.assertTrue(sentRequests.isEmpty());
+	}
+
+	@Test
+	@DisplayName("두 유저 간의 ACCEPT 상태인 관계를 조회할 수 있다.")
+	@Sql(scripts = {"/set-all-relation.sql"})
+	public void findAcceptedRelationBetweenUsers() {
+		// Given: Test data setup from 'set-all-relation.sql' script
+		String userId1 = "3"; // User3
+		String userId2 = "4"; // User4
+
+		// When: Calling the repository method to find an accepted relationship
+		Optional<UserRelationShip> relationship = userRelationShipRepository.findAcceptedRelationBetweenUsers(userId1,
+			userId2, RelationStatus.ACCEPT);
+
+		// Then: Verifying the relationship is found and is in ACCEPT status
+		assertThat(relationship).isPresent(); // Check that a relationship is found
+		assertThat(relationship.get().getRelationStatus()).isEqualTo(RelationStatus.ACCEPT);
+		assertThat(relationship.get().getSender().getId()).isEqualTo(userId1);
+		assertThat(relationship.get().getReceiver().getId()).isEqualTo(userId2);
 	}
 
 	private User createUser(String nickname, String snsId) {
