@@ -80,6 +80,7 @@ public class User extends BaseEntity {
 	private String oneSignalId;
 
 	@OneToMany(mappedBy = "giver", orphanRemoval = true)
+	@Builder.Default
 	private List<Cheer> cheers = new ArrayList<>();
 
 	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
