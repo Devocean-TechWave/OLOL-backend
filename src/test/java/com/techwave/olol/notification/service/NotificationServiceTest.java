@@ -2,6 +2,8 @@ package com.techwave.olol.notification.service;
 
 import static org.mockito.Mockito.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.techwave.olol.notification.client.OneSignalClient;
 import com.techwave.olol.notification.config.OneSignalProperties;
+import com.techwave.olol.user.domain.User;
+import com.techwave.olol.user.repository.UserRepository;
 
 @DisplayName("NotificationService 모킹 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -21,6 +25,9 @@ class NotificationServiceTest {
 
 	@Mock
 	private OneSignalProperties oneSignalProperties;
+
+	@Mock
+	private UserRepository userRepository;
 
 	@InjectMocks
 	private NotificationService notificationService;
@@ -40,6 +47,12 @@ class NotificationServiceTest {
 
 		// OneSignalClient의 sendNotification 메서드 모킹
 		when(oneSignalClient.sendNotification(anyString(), anyMap())).thenReturn(mockResponse);
+
+		User user = User.builder()
+			.id(userId)
+			.oneSignalId("mock-one-signal-id")
+			.build();
+		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
 		// when
 		notificationService.sendNotification(userId, title, message);
