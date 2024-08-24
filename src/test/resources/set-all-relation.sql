@@ -74,3 +74,12 @@ VALUES (7, 'FRIEND', true, 'REQUEST', '7', '8'),    -- User7 sent a friend reque
        (12, 'FRIEND', true, 'REQUEST', '12', '13'), -- User12 sent a friend request to User13, but it was deleted
        (16, 'FRIEND', true, 'REQUEST', '16', '17'), -- User16 sent a friend request to User17, but it was deleted
        (20, 'FRIEND', true, 'REQUEST', '20', '1'); -- User20 sent a friend request to User1, but it was deleted
+
+INSERT INTO mission (id, start_at, end_at, name, emoji, reward, success_quota, is_success, is_image_required, is_delete,
+                     giver_id, receiver_id)
+VALUES (X'123E4567E89B12D3A456426614174000', '2021-01-01', '2021-12-31', 'Mission1', '🎉', '1000', 10, false, false,
+        false, '1', '2'),
+       (X'123E4567E89B12D3A456426614174001', '2024-01-01', '2024-08-31', 'Mission2', '🎉', '1000', 10, false, false,
+        false, '2', '3'),
+       (X'123E4567E89B12D3A456426614174002', '2024-01-01', '2024-08-31', 'Mission3', '🎉', '1000', 10, false, false,
+        false, '3', '4');
