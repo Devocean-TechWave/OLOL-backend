@@ -43,13 +43,13 @@ public class CheerService {
 			.orElseThrow(() -> new IllegalArgumentException("미션을 찾을 수 없습니다."));
 		Cheer cheer = Cheer.builder()
 			.cheerType(cheerType)
-			.cheerGiver(
+			.giver(
 				userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다.")))
 			.mission(mission)
 			.build();
 		cheerRepository.save(cheer);
 		User receiver = mission.getReceiver();
-		// notificationService.sendCheerNotification(cheer, receiver);
+		notificationService.sendNotification(cheer, receiver);
 		return UserInfoDto.fromEntity(receiver);
 	}
 
@@ -68,7 +68,7 @@ public class CheerService {
 			.build();
 		userRepository.findById(receiverId).orElseThrow(() -> new IllegalArgumentException("콕 찔린 유저를 찾을 수 없습니다."));
 		pokeRepository.save(poke);
-		//TODO: notificationService.sendPokeNotification(poke);
+		notificationService.sendNotification(poke, receiverId);
 		return UserInfoDto.fromEntity(userRepository.findById(receiverId).get());
 	}
 }
