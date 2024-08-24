@@ -31,7 +31,13 @@ public interface UserRelationShipRepository extends JpaRepository<UserRelationSh
 
 	List<UserRelationShip> findTop10ByReceiverIdAndRelationStatus(String receiverId, RelationStatus relationStatus);
 
-	List<UserRelationShip> findTop10BySenderIdAndRelationStatus(String senderId, RelationStatus relationStatus);
+	@Query("SELECT ur FROM UserRelationShip ur WHERE " +
+		"ur.sender.id = :userId AND " +
+		"ur.relationStatus = :status AND ur.isDelete = false " +
+		"ORDER BY ur.updatedTime DESC")
+	List<UserRelationShip> findTop10BySenderIdAndRelationStatus(
+		@Param("userId") String userId,
+		@Param("status") RelationStatus status);
 
 	@Query("SELECT ur FROM UserRelationShip ur WHERE " +
 		"(ur.sender.id = :userId1 AND ur.receiver.id = :userId2 OR " +
@@ -41,4 +47,12 @@ public interface UserRelationShipRepository extends JpaRepository<UserRelationSh
 		@Param("userId1") String userId1,
 		@Param("userId2") String userId2,
 		@Param("status") RelationStatus status);
+
+	@Query("SELECT ur FROM UserRelationShip ur WHERE " +
+		"(ur.sender.id = :userId OR ur.receiver.id = :userId1) AND " +
+		"ur.relationStatus = :status AND ur.isDelete = false")
+	List<UserRelationShip> findAllAcceptedRelationByUserId(
+		@Param("userId") String userId,
+		@Param("status") RelationStatus status);
+
 }
