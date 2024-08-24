@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_mission_cheer")
 @Entity
 @Getter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Cheer {
 	@Id
 	@GeneratedValue
@@ -30,7 +33,7 @@ public class Cheer {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false)
 	private CheerType cheerType;
-
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "giver_id")
 	private User cheerGiver;
@@ -39,8 +42,4 @@ public class Cheer {
 	@JoinColumn(name = "mission_id")
 	private Mission mission;
 
-	@Builder
-	public Cheer(CheerType cheerType) {
-		this.cheerType = cheerType;
-	}
 }

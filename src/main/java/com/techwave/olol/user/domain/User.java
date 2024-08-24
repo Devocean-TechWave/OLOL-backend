@@ -1,6 +1,7 @@
 package com.techwave.olol.user.domain;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -79,7 +80,7 @@ public class User extends BaseEntity {
 	private String oneSignalId;
 
 	@OneToMany(mappedBy = "cheerGiver", orphanRemoval = true)
-	private List<Cheer> cheers;
+	private List<Cheer> cheers = new ArrayList<>();
 
 	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default

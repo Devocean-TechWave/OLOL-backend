@@ -1,5 +1,6 @@
 package com.techwave.olol.relation.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -22,6 +23,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +33,8 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Builder
+@AllArgsConstructor
 @SQLRestriction("is_delete = false")
 @SQLDelete(sql = "UPDATE user_relationship SET is_delete = true WHERE id = ?")
 public class UserRelationShip extends BaseEntity {
@@ -61,7 +65,8 @@ public class UserRelationShip extends BaseEntity {
 	private User receiver;
 
 	@OneToMany(mappedBy = "userRelationShip")
-	List<Poke> pokes;
+	@Builder.Default
+	List<Poke> pokes = new ArrayList<>();
 
 	@Builder
 	public UserRelationShip(Long id, User sender, User receiver, RelationType relationType,
