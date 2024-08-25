@@ -34,6 +34,8 @@ public class SwaggerConfig {
 
 		return new OpenAPI()
 			.addServersItem(new Server().url("http://localhost:8080"))
+			.addServersItem(new Server().url("http://ollangollang.duckdns.org:8080"))
+			.addServersItem(new Server().url("http://3.39.217.91:8080"))
 			.components(new Components())
 			.info(info)
 			.addSecurityItem(securityRequirement)
