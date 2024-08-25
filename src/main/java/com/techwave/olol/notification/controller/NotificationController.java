@@ -17,12 +17,12 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @Tag(name = "Notification", description = "알림 관련 API")
-@RequestMapping("/notification")
+@RequestMapping("/api/v1/notification")
 @RequiredArgsConstructor
 public class NotificationController {
 	private final NotificationService notificationService;
 
-	@GetMapping("/")
+	@GetMapping
 	@Operation(summary = "알림 조회", description = "내가 받은 알림을 조회합니다.(페이징 처리 필요)")
 	public ResponseEntity<List<NotificationResDto>> getNotification() {
 		return ResponseEntity.ok(notificationService.getNotification(SecurityUtil.getCurrentUserId()));

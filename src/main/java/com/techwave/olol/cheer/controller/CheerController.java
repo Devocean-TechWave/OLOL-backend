@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.techwave.olol.cheer.dto.CheerRequestDto;
@@ -18,11 +19,12 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/cheers")
 public class CheerController {
 	private final CheerService cheerService;
 
 	@Operation(summary = "응원 하기", description = "다른 유저에게 응원을 보냅니다.")
-	@PostMapping("/cheers/{missionId}")
+	@PostMapping("/{missionId}")
 	public ResponseEntity<UserInfoDto> cheers(@PathVariable UUID missionId,
 		@RequestBody CheerRequestDto cheerRequestDto) {
 		return ResponseEntity.ok(
@@ -30,7 +32,7 @@ public class CheerController {
 	}
 
 	@Operation(summary = "응원 요청", description = "다른 친구에게 응원을 요청합니다.")
-	@PostMapping("/cheers/request/{userId}")
+	@PostMapping("/request/{userId}")
 	public ResponseEntity<UserInfoDto> request(@PathVariable String userId) {
 		return ResponseEntity.ok(cheerService.request(SecurityUtil.getCurrentUserId(), userId));
 	}

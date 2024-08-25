@@ -68,7 +68,7 @@ public class CheerControllerTest {
 		CheerRequestDto cheerRequestDto = new CheerRequestDto();
 		cheerRequestDto.setCheerType(CheerType.LIKE);
 
-		mockMvc.perform(post("/cheers/" + missionId)
+		mockMvc.perform(post("/api/v1/cheers/" + missionId)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(cheerRequestDto)))
 			.andExpect(status().isOk())
@@ -83,7 +83,7 @@ public class CheerControllerTest {
 	public void testRequest() throws Exception {
 		String userId = "2";
 
-		mockMvc.perform(post("/cheers/request/" + userId))
+		mockMvc.perform(post("/api/v1/cheers/request/" + userId))
 			.andExpect(status().isBadRequest());
 	}
 
@@ -94,7 +94,7 @@ public class CheerControllerTest {
 	public void testRequestToFriend() throws Exception {
 		String userId = "4";
 
-		mockMvc.perform(post("/cheers/request/" + userId))
+		mockMvc.perform(post("/api/v1/cheers/request/" + userId))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.id").value(userId))
 			.andExpect(jsonPath("$.name").isNotEmpty());
