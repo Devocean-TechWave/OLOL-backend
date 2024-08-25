@@ -24,6 +24,15 @@ public class ApiExceptionHandler {
 		return ResponseEntity.ok(new ApiErrorResponse(error));
 	}
 
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<?> handleIllegalArgumentException(HttpServletRequest request,
+		IllegalArgumentException error) {
+		log.error("IllegalArgumentException message({}), path({} {})", error.getMessage(), request.getMethod(),
+			request.getRequestURI());
+
+		return ResponseEntity.badRequest().body(new ApiErrorResponse(error.getMessage()));
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity handleException(HttpServletRequest request, Exception error) {
 		log.error("Exception message({}), path({} {})", error.getMessage(), request.getMethod(),

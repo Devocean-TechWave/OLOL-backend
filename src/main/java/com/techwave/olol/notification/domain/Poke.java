@@ -1,17 +1,15 @@
-package com.techwave.olol.cheer.domain;
+package com.techwave.olol.notification.domain;
+
+import java.time.LocalDate;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.techwave.olol.global.jpa.BaseEntity;
-import com.techwave.olol.mission.domain.Mission;
-import com.techwave.olol.user.domain.User;
+import com.techwave.olol.relation.domain.UserRelationShip;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -23,28 +21,22 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "user_mission_cheer")
 @Entity
-@Getter
-@Builder
-@EntityListeners(AuditingEntityListener.class)
+@Table(name = "poke")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 @AllArgsConstructor
-public class Cheer extends BaseEntity {
+@Getter
+@EntityListeners(AuditingEntityListener.class)
+public class Poke extends BaseEntity {
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "type", nullable = false)
-	private CheerType cheerType;
+	@Column(name = "date", nullable = false)
+	LocalDate date;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "giver_id")
-	private User giver;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "mission_id")
-	private Mission mission;
-
+	@ManyToOne
+	@JoinColumn(name = "user_relation_ship_id")
+	private UserRelationShip userRelationShip;
 }

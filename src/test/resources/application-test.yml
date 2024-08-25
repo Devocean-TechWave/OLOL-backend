@@ -59,3 +59,7 @@ security:
     - /error
     - /test/**
     - /
+onesignal:
+  url: https://onesignal.com/api/v1
+  app-id: 테스트아이디
+  rest-api-key: 테스트키

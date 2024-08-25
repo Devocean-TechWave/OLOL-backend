@@ -59,6 +59,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     testImplementation 'io.projectreactor:reactor-test'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'

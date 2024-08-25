@@ -32,4 +32,6 @@ public interface MissionRepository extends JpaRepository<Mission, UUID> {
 	List<Mission> findByReceiver(User receiver);
 
 	Optional<Mission> findById(UUID missionId);
+
+	List<Mission> findByReceiverId(String receiverId);
 }

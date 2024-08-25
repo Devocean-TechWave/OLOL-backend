@@ -1,14 +1,20 @@
 package com.techwave.olol.relation.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.techwave.olol.global.jpa.BaseEntity;
+import com.techwave.olol.notification.domain.Poke;
 import com.techwave.olol.user.domain.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -16,17 +22,22 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Table(name = "user_relationship")
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Builder
+@AllArgsConstructor
 @SQLRestriction("is_delete = false")
 @SQLDelete(sql = "UPDATE user_relationship SET is_delete = true WHERE id = ?")
 public class UserRelationShip extends BaseEntity {
@@ -55,6 +66,10 @@ public class UserRelationShip extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "receiver_id")
 	private User receiver;
+
+	@OneToMany(mappedBy = "userRelationShip")
+	@Builder.Default
+	List<Poke> pokes = new ArrayList<>();
 
 	@Builder
 	public UserRelationShip(Long id, User sender, User receiver, RelationType relationType,

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.techwave.olol.login.dto.AuthTokenDto;
 import com.techwave.olol.login.service.LoginService;
 import com.techwave.olol.user.dto.UserDto;
-import com.techwave.olol.user.dto.request.KakaoJoinRequest;
+import com.techwave.olol.user.dto.request.KakaoJoinRequestDto;
 import com.techwave.olol.user.service.ImagesService;
 import com.techwave.olol.user.service.UserService;
 
@@ -135,7 +135,7 @@ public class UserController {
 	@PostMapping("/join/kakao")
 	public ResponseEntity<Boolean> joinKakao(
 		Authentication authentication,
-		@RequestBody @Valid KakaoJoinRequest request) {
+		@RequestBody @Valid KakaoJoinRequestDto request) {
 		UserDetails userDetails = (UserDetails)authentication.getPrincipal();
 		userService.kakaoJoin(userDetails.getUsername(), request);
 		return ResponseEntity.ok(true);

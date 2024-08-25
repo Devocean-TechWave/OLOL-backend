@@ -1,5 +1,7 @@
 package com.techwave.olol.relation.repository;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +17,9 @@ import com.techwave.olol.login.constant.AuthType;
 import com.techwave.olol.relation.domain.RelationStatus;
 import com.techwave.olol.relation.domain.RelationType;
 import com.techwave.olol.relation.domain.UserRelationShip;
+import com.techwave.olol.user.domain.GenderType;
 import com.techwave.olol.user.domain.User;
-import com.techwave.olol.user.dto.request.KakaoJoinRequest;
+import com.techwave.olol.user.dto.request.KakaoJoinRequestDto;
 import com.techwave.olol.user.repository.UserRepository;
 
 @DataJpaTest
@@ -256,16 +259,100 @@ class UserRelationShipRepositoryTest {
 		Assertions.assertFalse(relationship.isPresent());
 	}
 
+	@Test
+	@DisplayName("받은 친구 요청을 최신순으로 10개 조회할 수 있다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findTop10ByReceiverIdAndRelationStatus() {
+		// given
+		String receiverId = "1";
+
+		// when
+		List<UserRelationShip> receivedRequests = userRelationShipRepository.findTop10ByReceiverIdAndRelationStatus(
+			receiverId, RelationStatus.REQUEST);
+
+		// then
+		Assertions.assertEquals(2, receivedRequests.size());
+		Assertions.assertEquals("2", receivedRequests.get(0).getSender().getId());
+		Assertions.assertEquals("3", receivedRequests.get(1).getSender().getId());
+	}
+
+	@Test
+	@DisplayName("보낸 친구 요청을 최신순으로 10개 조회할 수 있다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findTop10BySenderIdAndRelationStatus() {
+		// given
+		String senderId = "1";
+
+		// when
+		List<UserRelationShip> sentRequests = userRelationShipRepository.findTop10BySenderIdAndRelationStatus(
+			senderId, RelationStatus.REQUEST);
+
+		// then
+		Assertions.assertEquals(9, sentRequests.size());
+		Assertions.assertEquals("2", sentRequests.get(0).getReceiver().getId());
+		Assertions.assertEquals("3", sentRequests.get(1).getReceiver().getId());
+	}
+
+	@Test
+	@DisplayName("받은 친구 요청이 없을 때 빈 리스트를 반환한다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findTop10ByReceiverIdAndRelationStatus_Empty() {
+		// given
+		String receiverId = "11"; // 존재하지 않는 사용자 ID
+
+		// when
+		List<UserRelationShip> receivedRequests = userRelationShipRepository.findTop10ByReceiverIdAndRelationStatus(
+			receiverId, RelationStatus.REQUEST);
+
+		// then
+		Assertions.assertTrue(receivedRequests.isEmpty());
+	}
+
+	@Test
+	@DisplayName("보낸 친구 요청이 없을 때 빈 리스트를 반환한다.")
+	@Sql(scripts = {"/init-relation.sql"})
+	void findTop10BySenderIdAndRelationStatus_Empty() {
+		// given
+		String senderId = "11"; // 존재하지 않는 사용자 ID
+
+		// when
+		List<UserRelationShip> sentRequests = userRelationShipRepository.findTop10BySenderIdAndRelationStatus(
+			senderId, RelationStatus.REQUEST);
+
+		// then
+		Assertions.assertTrue(sentRequests.isEmpty());
+	}
+
+	@Test
+	@DisplayName("두 유저 간의 ACCEPT 상태인 관계를 조회할 수 있다.")
+	@Sql(scripts = {"/set-all-relation.sql"})
+	public void findAcceptedRelationBetweenUsers() {
+		// Given: Test data setup from 'set-all-relation.sql' script
+		String userId1 = "3"; // User3
+		String userId2 = "4"; // User4
+
+		// When: Calling the repository method to find an accepted relationship
+		Optional<UserRelationShip> relationship = userRelationShipRepository.findAcceptedRelationBetweenUsers(userId1,
+			userId2, RelationStatus.ACCEPT);
+
+		// Then: Verifying the relationship is found and is in ACCEPT status
+		assertThat(relationship).isPresent(); // Check that a relationship is found
+		assertThat(relationship.get().getRelationStatus()).isEqualTo(RelationStatus.ACCEPT);
+		assertThat(relationship.get().getSender().getId()).isEqualTo(userId1);
+		assertThat(relationship.get().getReceiver().getId()).isEqualTo(userId2);
+	}
+
 	private User createUser(String nickname, String snsId) {
 		User user = User.builder()
 			.authType(AuthType.KAKAO)
 			.snsId(snsId)
 			.build();
-		KakaoJoinRequest kakaoJoinRequest = new KakaoJoinRequest();
-		kakaoJoinRequest.setNickname(nickname);
-		kakaoJoinRequest.setBirth(LocalDate.of(1994, 1, 1));
-		kakaoJoinRequest.setGender("male");
-		user.setKakaoUser(kakaoJoinRequest);
+		KakaoJoinRequestDto kakaoJoinRequestDto = new KakaoJoinRequestDto();
+		kakaoJoinRequestDto.setNickname(nickname);
+		kakaoJoinRequestDto.setBirth(LocalDate.of(1994, 1, 1));
+		kakaoJoinRequestDto.setGender(GenderType.MALE);
+		user.setKakaoUser(kakaoJoinRequestDto);
 		return userRepository.save(user);
 	}
+
 }

@@ -1,6 +1,7 @@
 package com.techwave.olol.user.domain;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,7 +13,7 @@ import com.techwave.olol.cheer.domain.Cheer;
 import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.login.constant.AuthType;
 import com.techwave.olol.relation.domain.UserRelationShip;
-import com.techwave.olol.user.dto.request.KakaoJoinRequest;
+import com.techwave.olol.user.dto.request.KakaoJoinRequestDto;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -75,8 +76,12 @@ public class User extends BaseEntity {
 	@Column(name = "sns_id", unique = true, nullable = false)
 	private String snsId; // kakao 로그인 ID
 
-	@OneToMany(mappedBy = "cheerGiver", orphanRemoval = true)
-	private List<Cheer> cheers;
+	@Column(name = "one_signal_id")
+	private String oneSignalId;
+
+	@OneToMany(mappedBy = "giver", orphanRemoval = true)
+	@Builder.Default
+	private List<Cheer> cheers = new ArrayList<>();
 
 	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
@@ -98,11 +103,12 @@ public class User extends BaseEntity {
 		return isDelete;
 	}
 
-	public void setKakaoUser(KakaoJoinRequest request) {
+	public void setKakaoUser(KakaoJoinRequestDto request) {
 		this.name = request.getName();
 		this.nickname = request.getNickname();
 		this.birth = request.getBirth();
 		this.gender = GenderType.MALE.getName().equals(request.getGender()) ? GenderType.MALE : GenderType.FEMALE;
+		this.oneSignalId = request.getOneSignalId();
 	}
 
 	public void setIsDelete(boolean isDelete) {
