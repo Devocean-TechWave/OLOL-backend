@@ -6,6 +6,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.techwave.olol.login.dto.reponse.ApiErrorResponse;
 
@@ -31,6 +32,14 @@ public class ApiExceptionHandler {
 			request.getRequestURI());
 
 		return ResponseEntity.badRequest().body(new ApiErrorResponse(error.getMessage()));
+	}
+
+	@ExceptionHandler(ResponseStatusException.class)
+	public ResponseEntity handleResponseStatusException(HttpServletRequest request, ResponseStatusException error) {
+		log.error("ResponseStatusException message({}), path({} {})", error.getReason(), request.getMethod(),
+			request.getRequestURI());
+
+		return ResponseEntity.status(error.getStatusCode()).body(new ApiErrorResponse(error.getReason()));
 	}
 
 	@ExceptionHandler(Exception.class)
