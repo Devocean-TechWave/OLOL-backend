@@ -11,14 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.techwave.olol.mission.domain.Memory;
 import com.techwave.olol.mission.domain.Mission;
-import com.techwave.olol.mission.domain.SuccessStamp;
 
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
-class SuccessStampRepositoryTest {
+class MemoryRepositoryTest {
 	@Autowired
-	private SuccessStampRepository successStampRepository;
+	private MemoryRepository memoryRepository;
 
 	@Autowired
 	private MissionRepository missionRepository;
@@ -34,16 +34,16 @@ class SuccessStampRepositoryTest {
 			.build();
 		missionRepository.save(mission);
 
-		SuccessStamp successStamp = SuccessStamp.builder()
+		Memory memory = Memory.builder()
 			.mission(missionRepository.findById(mission.getId()).get())
 			.successDate(LocalDate.of(2024, 1, 1))
 			.build();
 		// when
-		successStampRepository.save(successStamp);
-		mission.addSuccessStamp(successStamp);
+		memoryRepository.save(memory);
+		mission.addSuccessStamp(memory);
 		// then
-		SuccessStamp savedSuccessStamp = successStampRepository.findById(successStamp.getId()).get();
-		assertThat(savedSuccessStamp.getId()).isEqualTo(successStamp.getId());
+		Memory savedMemory = memoryRepository.findById(memory.getId()).get();
+		assertThat(savedMemory.getId()).isEqualTo(memory.getId());
 	}
 
 }

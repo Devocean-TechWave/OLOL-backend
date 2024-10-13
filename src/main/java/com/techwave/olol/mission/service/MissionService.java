@@ -14,10 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.techwave.olol.mission.domain.Mission;
-import com.techwave.olol.mission.domain.SuccessStamp;
 import com.techwave.olol.mission.dto.request.ReqMissionDto;
-import com.techwave.olol.mission.repository.MissionRepository;
-import com.techwave.olol.mission.repository.SuccessStampRepository;
+import com.techwave.olol.mission.repository.MemoryRepository;
 import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.repository.UserRepository;
 
@@ -33,9 +31,9 @@ public class MissionService {
 	private String bucketName;
 
 	private final AmazonS3 amazonS3Client;
-	private final MissionRepository missionRepository;
+	// private final MissionRepository missionRepository;
 	private final UserRepository userRepository;
-	private final SuccessStampRepository successStampRepository;
+	private final MemoryRepository memoryRepository;
 
 	public void verifyMission(String userId, UUID missionId, MultipartFile multipartFile) throws IOException {
 		// 유저 조회
@@ -43,8 +41,8 @@ public class MissionService {
 			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
 
 		// 미션 조회
-		Mission mission = missionRepository.findById(missionId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 ID의 미션을 찾을 수 없습니다: " + missionId));
+		// Mission mission = missionRepository.findById(missionId)
+		// 	.orElseThrow(() -> new IllegalArgumentException("해당 ID의 미션을 찾을 수 없습니다: " + missionId));
 
 		// 파일 타입 체크
 		if (!isValidFileType(multipartFile)) {
@@ -52,16 +50,16 @@ public class MissionService {
 		}
 
 		// 이미지 저장 및 URL 반환
-		String uploadImageUrl = saveImage(multipartFile, mission.getId());
-
-		SuccessStamp successStamp = SuccessStamp.builder()
-			.mission(mission)
-			.imageUrl(uploadImageUrl)
-			.successDate(LocalDate.now())
-			.build();
-
-		successStampRepository.save(successStamp);
-		missionRepository.save(mission);
+		// String uploadImageUrl = saveImage(multipartFile, mission.getId());
+		//
+		// Memory memory = Memory.builder()
+		// 	.mission(mission)
+		// 	.imageUrl(uploadImageUrl)
+		// 	.successDate(LocalDate.now())
+		// 	.build();
+		//
+		// memoryRepository.save(memory);
+		// missionRepository.save(mission);
 	}
 
 	// 미션 조회
@@ -70,17 +68,17 @@ public class MissionService {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
 
-		// 유저가 생성한 모든 미션 조회
-		if (isGiver) {
-			return active
-				? missionRepository.findProgressMissionsByGiver(user)
-				: missionRepository.findCompletedMissionsByGiver(user);
-		} else {
-			return active
-				? missionRepository.findProgressMissionsByReceiver(user)
-				: missionRepository.findCompletedMissionsByReceiver(user);
-		}
-
+		// // 유저가 생성한 모든 미션 조회
+		// if (isGiver) {
+		// 	return active
+		// 		? missionRepository.findProgressMissionsByGiver(user)
+		// 		: missionRepository.findCompletedMissionsByGiver(user);
+		// } else {
+		// 	return active
+		// 		? missionRepository.findProgressMissionsByReceiver(user)
+		// 		: missionRepository.findCompletedMissionsByReceiver(user);
+		// }
+		return null;
 	}
 
 	public void registerMission(String userId, ReqMissionDto reqMissionDto) {
@@ -99,11 +97,9 @@ public class MissionService {
 
 		// 미션 등록
 		Mission mission = Mission.createMission(reqMissionDto);
-		mission.setGiver(giver);
-		mission.setReceiver(receiver);
 
 		// 미션 저장
-		missionRepository.save(mission);
+		// missionRepository.save(mission);
 	}
 
 	public void deleteMission(String userId, UUID missionId) {
@@ -112,12 +108,12 @@ public class MissionService {
 			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
 
 		// 미션 조회
-		Mission mission = missionRepository.findById(missionId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 ID의 미션을 찾을 수 없습니다: " + missionId));
-
-		// 미션 삭제
-		mission.deleteMission();
-		missionRepository.save(mission);
+		// Mission mission = missionRepository.findById(missionId)
+		// 	.orElseThrow(() -> new IllegalArgumentException("해당 ID의 미션을 찾을 수 없습니다: " + missionId));
+		//
+		// // 미션 삭제
+		// mission.deleteMission();
+		// missionRepository.save(mission);
 	}
 
 	// === 편의 메서드 ===

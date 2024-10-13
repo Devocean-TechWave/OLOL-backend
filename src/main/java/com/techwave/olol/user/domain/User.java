@@ -1,21 +1,14 @@
 package com.techwave.olol.user.domain;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.techwave.olol.cheer.domain.Cheer;
 import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.login.constant.AuthType;
-import com.techwave.olol.relation.domain.UserRelationShip;
 import com.techwave.olol.user.dto.request.KakaoJoinRequestDto;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -24,7 +17,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -69,27 +63,19 @@ public class User extends BaseEntity {
 	@Column(name = "auth_type", nullable = false)
 	private AuthType authType; // 일반 유저, kakao 로그인 유저 구분
 
-	@Column(name = "is_delete")
-	@ColumnDefault("false")
-	private Boolean isDelete;
-
 	@Column(name = "sns_id", unique = true, nullable = false)
 	private String snsId; // kakao 로그인 ID
 
-	@Column(name = "one_signal_id")
-	private String oneSignalId;
+	@Column(name = "role")
+	private String role;
 
-	@OneToMany(mappedBy = "giver", orphanRemoval = true)
-	@Builder.Default
-	private List<Cheer> cheers = new ArrayList<>();
+	@Column(name = "is_delete")
+	@ColumnDefault("false")
+	private Boolean isDelete = false;
 
-	@OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private Set<UserRelationShip> sentRequests = new HashSet<>();
-
-	@OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private Set<UserRelationShip> receivedRequests = new HashSet<>();
+	@ManyToOne
+	@JoinColumn(name = "family_id")
+	private Family family;
 
 	@Builder
 	public User(AuthType authType, String snsId) {
@@ -108,19 +94,10 @@ public class User extends BaseEntity {
 		this.nickname = request.getNickname();
 		this.birth = request.getBirth();
 		this.gender = GenderType.MALE.getName().equals(request.getGender()) ? GenderType.MALE : GenderType.FEMALE;
-		this.oneSignalId = request.getOneSignalId();
 	}
 
 	public void setIsDelete(boolean isDelete) {
 		this.isDelete = isDelete;
-	}
-
-	public void addSenderRelationShip(UserRelationShip relationShip) {
-		sentRequests.add(relationShip);
-	}
-
-	public void addReceiverRelationShip(UserRelationShip relationShip) {
-		receivedRequests.add(relationShip);
 	}
 
 }

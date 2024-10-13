@@ -28,11 +28,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.techwave.olol.mission.domain.Memory;
 import com.techwave.olol.mission.domain.Mission;
-import com.techwave.olol.mission.domain.SuccessStamp;
 import com.techwave.olol.mission.dto.request.ReqMissionDto;
+import com.techwave.olol.mission.repository.MemoryRepository;
 import com.techwave.olol.mission.repository.MissionRepository;
-import com.techwave.olol.mission.repository.SuccessStampRepository;
 import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.repository.UserRepository;
 
@@ -43,7 +43,7 @@ public class MissionServiceTest {
 	private MissionRepository missionRepository;
 
 	@Mock
-	private SuccessStampRepository successStampRepository;
+	private MemoryRepository memoryRepository;
 
 	@Mock
 	private AmazonS3 amazonS3Client;
@@ -82,8 +82,6 @@ public class MissionServiceTest {
 		reqMissionDto.setSuccessQuota(5);
 
 		mission = Mission.createMission(reqMissionDto);
-		mission.setGiver(giver);
-		mission.setReceiver(receiver);
 		mission.setId(UUID.randomUUID());
 
 		multipartFile = new MockMultipartFile("file", "test.png", "image/png", "test image content".getBytes());
@@ -112,7 +110,7 @@ public class MissionServiceTest {
 		missions.add(mission);
 
 		when(userRepository.findById("giverNickname")).thenReturn(Optional.of(giver));
-		when(missionRepository.findProgressMissionsByGiver(giver)).thenReturn(missions);
+		// when(missionRepository.findProgressMissionsByGiver(giver)).thenReturn(missions);
 
 		// when
 		List<Mission> result = missionService.getMissions("giverNickname", true, true);
@@ -131,7 +129,7 @@ public class MissionServiceTest {
 		missions.add(mission);
 
 		when(userRepository.findById("giverNickname")).thenReturn(Optional.of(giver));
-		when(missionRepository.findCompletedMissionsByGiver(giver)).thenReturn(missions);
+		// when(missionRepository.findCompletedMissionsByGiver(giver)).thenReturn(missions);
 
 		// when
 		List<Mission> result = missionService.getMissions("giverNickname", false, true);
@@ -184,7 +182,7 @@ public class MissionServiceTest {
 		verify(missionRepository, times(1)).findById(mission.getId());
 		verify(amazonS3Client, times(1)).putObject(any(PutObjectRequest.class));
 		verify(amazonS3Client, times(1)).getUrl(eq(bucketName), anyString());
-		verify(successStampRepository, times(1)).save(any(SuccessStamp.class));  // SuccessStamp가 저장되었는지 확인
+		verify(memoryRepository, times(1)).save(any(Memory.class));  // SuccessStamp가 저장되었는지 확인
 		verify(missionRepository, times(1)).save(mission);
 	}
 
