@@ -4,8 +4,8 @@ import java.time.LocalDate;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.techwave.olol.family.domain.Family;
 import com.techwave.olol.global.jpa.BaseEntity;
-import com.techwave.olol.user.domain.Family;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,6 +38,9 @@ public class Memory extends BaseEntity {
 
 	@Column(name = "create_image_url")
 	private String createImageUrl;
+
+	@Column(name = "score")
+	private Long score;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "family_id")

@@ -26,6 +26,5 @@ public class KakaoJoinRequestDto {
 	@NotNull
 	@Schema(description = "성별", example = "M")
 	private GenderType gender;
-	@NotNull
-	private String oneSignalId;
+	
 }

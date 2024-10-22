@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.techwave.olol.family.domain.Family;
 import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.login.constant.AuthType;
 import com.techwave.olol.user.dto.request.KakaoJoinRequestDto;

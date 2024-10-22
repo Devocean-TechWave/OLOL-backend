@@ -17,6 +17,7 @@ import com.techwave.olol.login.repository.RefreshTokenRepository;
 import com.techwave.olol.user.domain.GenderType;
 import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.dto.UserDto;
+import com.techwave.olol.user.dto.UserInfoDto;
 import com.techwave.olol.user.dto.request.EditUserRequest;
 import com.techwave.olol.user.dto.request.KakaoJoinRequestDto;
 import com.techwave.olol.user.repository.UserRepository;
@@ -33,9 +34,9 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
 
-	public UserDto getUser(String id) {
+	public UserInfoDto getUser(String id) {
 		User user = findById(id);
-		return new UserDto(user);
+		return UserInfoDto.fromEntity(user);
 	}
 
 	public UserDto findByNickname(String nickname) {
@@ -50,7 +51,7 @@ public class UserService {
 
 	// 성별 예외처리 코드 추가
 	@Transactional
-	public void kakaoJoin(String id, KakaoJoinRequestDto request) {
+	public String kakaoJoin(String id, KakaoJoinRequestDto request) {
 		User user = findById(id);
 		if (user.getAuthType() != AuthType.KAKAO)
 			throw new ApiException(Error.AUTH_TYPE_MISMATCH);
@@ -61,7 +62,8 @@ public class UserService {
 
 		user.setKakaoUser(request);
 
-		userRepository.save(user);
+		User savedUser = userRepository.save(user);
+		return savedUser.getId();
 	}
 
 	@Transactional

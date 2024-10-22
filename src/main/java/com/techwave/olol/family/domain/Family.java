@@ -1,4 +1,4 @@
-package com.techwave.olol.user.domain;
+package com.techwave.olol.family.domain;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.mission.domain.Memory;
+import com.techwave.olol.user.domain.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

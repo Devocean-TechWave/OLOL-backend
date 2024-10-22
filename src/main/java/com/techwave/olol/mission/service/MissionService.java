@@ -3,7 +3,6 @@ package com.techwave.olol.mission.service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.techwave.olol.mission.domain.Mission;
-import com.techwave.olol.mission.dto.request.ReqMissionDto;
+import com.techwave.olol.mission.dto.MemoryResDto;
+import com.techwave.olol.mission.dto.MissionResDto;
 import com.techwave.olol.mission.repository.MemoryRepository;
 import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.repository.UserRepository;
@@ -34,6 +34,10 @@ public class MissionService {
 	// private final MissionRepository missionRepository;
 	private final UserRepository userRepository;
 	private final MemoryRepository memoryRepository;
+
+	public void createTheme(String imageUrl) {
+
+	}
 
 	public void verifyMission(String userId, UUID missionId, MultipartFile multipartFile) throws IOException {
 		// 유저 조회
@@ -81,61 +85,58 @@ public class MissionService {
 		return null;
 	}
 
-	public void registerMission(String userId, ReqMissionDto reqMissionDto) {
-		log.info("userNickname: {}", userId);
-		// 유저 조회
-		User giver = userRepository.findById(userId)
-			.orElseThrow(
-				() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
-
-		// 미션 유저 조회
-		User receiver = userRepository.findById(reqMissionDto.getReceiverId())
-			.orElseThrow(
-				() -> new IllegalArgumentException(" --> 해당 닉네임의 유저를 찾을 수 없습니다: " + reqMissionDto.getReceiverId()));
-		// 미션 작성 가능성 validate
-		checkMission(reqMissionDto);
-
-		// 미션 등록
-		Mission mission = Mission.createMission(reqMissionDto);
-
-		// 미션 저장
-		// missionRepository.save(mission);
-	}
-
-	public void deleteMission(String userId, UUID missionId) {
+	public MissionResDto getTodayMission(String userId) {
 		// 유저 조회
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
 
-		// 미션 조회
-		// Mission mission = missionRepository.findById(missionId)
-		// 	.orElseThrow(() -> new IllegalArgumentException("해당 ID의 미션을 찾을 수 없습니다: " + missionId));
-		//
-		// // 미션 삭제
-		// mission.deleteMission();
-		// missionRepository.save(mission);
+		// LocalDate today = LocalDate.now();
+		// List<Mission> missions = missionRepository.findTodayMission(user, today);
+		// if (missions.isEmpty()) {
+		// 	return null;
+		// }
+		// Mission mission = missions.get(0);
+		// return MissionResDto.builder()
+		// 	.missionId(mission.getId())
+		// 	.missionName(mission.getName())
+		// 	.isComplete(mission.isComplete())
+		// 	.build();
+		return null;
+	}
+
+	public List<MemoryResDto> getSuccessMission(String userId, boolean all) {
+		// 유저 조회
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
+
+		// List<Mission> missions = missionRepository.findSuccessMissions(user);
+		// return missions.stream()
+		// 	.map(mission -> MissionResDto.builder()
+		// 		.missionId(mission.getId())
+		// 		.missionName(mission.getName())
+		// 		.isComplete(mission.isComplete())
+		// 		.build())
+		// 	.collect(Collectors.toList());
+		return null;
+	}
+
+	public List<MemoryResDto> getSuccessMission(String userId, Long familyId) {
+		// 유저 조회
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
+
+		// List<Mission> missions = missionRepository.findSuccessMissions(user, familyId);
+		// return missions.stream()
+		// 	.map(mission -> MissionResDto.builder()
+		// 		.missionId(mission.getId())
+		// 		.missionName(mission.getName())
+		// 		.isComplete(mission.isComplete())
+		// 		.build())
+		// 	.collect(Collectors.toList());
+		return null;
 	}
 
 	// === 편의 메서드 ===
-	private void checkMission(ReqMissionDto reqMissionDto) {
-		// 미션 기간 확인
-		checkMissionWeek(reqMissionDto.getStartAt(), reqMissionDto.getEndAt());
-
-		// 미션 성공 횟수 확인
-		if (reqMissionDto.getSuccessQuota() <= 0) {
-			throw new IllegalArgumentException("미션 성공 횟수는 0보다 커야합니다.");
-		}
-	}
-
-	private void checkMissionWeek(LocalDate startDate, LocalDate endDate) {
-		LocalDate now = LocalDate.now();
-		if (startDate.isBefore(now.minusWeeks(1))) {
-			throw new IllegalArgumentException("미션 주차는 현재 주차보다 이전일 수 없습니다.");
-		}
-		if (startDate.isAfter(endDate)) {
-			throw new IllegalArgumentException("미션 시작일은 미션 종료일보다 늦을 수 없습니다.");
-		}
-	}
 
 	public String saveImage(MultipartFile multipartFile, UUID missionId) throws IOException {
 		// 파일 이름에서 공백을 제거한 새로운 파일 이름 생성

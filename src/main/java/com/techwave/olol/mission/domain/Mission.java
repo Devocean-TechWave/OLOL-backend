@@ -64,6 +64,9 @@ public class Mission extends BaseEntity {
 	@ColumnDefault("false")
 	private boolean isDeleted = false;
 
+	@Column(name = "point", nullable = false)
+	private Long point;
+
 	@Builder.Default
 	@OneToMany(mappedBy = "mission")
 	private List<Memory> memories = new ArrayList<>();
@@ -83,9 +86,9 @@ public class Mission extends BaseEntity {
 	// 생성 메서드
 	public static Mission createMission(ReqMissionDto request) {
 		return Mission.builder()
-			.startAt(request.getStartAt())
-			.endAt(request.getEndAt())
 			.name(request.getName())
+			.description(request.getDescription())
+
 			.build();
 	}
 

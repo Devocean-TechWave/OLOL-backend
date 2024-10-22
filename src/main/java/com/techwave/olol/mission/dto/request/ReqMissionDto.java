@@ -12,12 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class ReqMissionDto {
-	private String receiverId;
 	private String name;
-	private String emoji;
-	private LocalDate startAt;
-	private LocalDate endAt;
-	private int successQuota;
-	private boolean isImageRequired;
-	private String reward;
+	private String description;
+	private LocalDate date;
 }

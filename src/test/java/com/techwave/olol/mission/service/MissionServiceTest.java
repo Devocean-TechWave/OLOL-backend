@@ -76,10 +76,6 @@ public class MissionServiceTest {
 		receiver.setNickname("receiverNickname");
 
 		reqMissionDto = new ReqMissionDto();
-		reqMissionDto.setReceiverId("receiverNickname");
-		reqMissionDto.setStartAt(LocalDate.now());
-		reqMissionDto.setEndAt(LocalDate.now().plusDays(1));
-		reqMissionDto.setSuccessQuota(5);
 
 		mission = Mission.createMission(reqMissionDto);
 		mission.setId(UUID.randomUUID());
@@ -96,7 +92,7 @@ public class MissionServiceTest {
 		when(missionRepository.save(any(Mission.class))).thenReturn(mission);
 
 		// when
-		missionService.registerMission("giverNickname", reqMissionDto);
+		// missionService.registerMission("giverNickname", reqMissionDto);
 
 		// then
 		verify(missionRepository, times(1)).save(any(Mission.class));
@@ -195,7 +191,7 @@ public class MissionServiceTest {
 		when(missionRepository.findById(missionId)).thenReturn(Optional.of(mission));
 
 		// when
-		missionService.deleteMission("userNickname", missionId);
+		// missionService.deleteMission("userNickname", missionId);
 
 		// then
 		verify(userRepository, times(1)).findById("userNickname");
