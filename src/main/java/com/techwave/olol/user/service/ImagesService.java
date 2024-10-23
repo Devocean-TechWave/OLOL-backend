@@ -10,8 +10,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.techwave.olol.global.exception.ApiException;
-import com.techwave.olol.global.exception.Error;
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +34,11 @@ public class ImagesService {
 			}
 		} catch (Exception e) {
 			log.error("get profileImage message: {}", e.getMessage());
-			throw new ApiException(Error.NOT_EXIST_IMAGE, e);
+			throw new AuthException(AuthErrorCode.IMAGE_NOT_EXIST);
 		}
 
 		if (!resource.exists()) {
-			throw new ApiException(Error.NOT_EXIST_IMAGE);
+			throw new AuthException(AuthErrorCode.IMAGE_NOT_EXIST);
 		}
 
 		return ResponseEntity.ok()

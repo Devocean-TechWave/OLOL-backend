@@ -13,8 +13,8 @@ import org.springframework.util.StringUtils;
 
 import com.techwave.olol.auth.config.JwtProperties;
 import com.techwave.olol.auth.dto.TokenDto;
-import com.techwave.olol.global.exception.ApiException;
-import com.techwave.olol.global.exception.Error;
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
 import com.techwave.olol.user.dto.SecurityUser;
 
 import io.jsonwebtoken.Claims;
@@ -47,7 +47,7 @@ public class JwtProvider {
 		Claims claims = validateToken(token);
 
 		if (StringUtils.isEmpty(claims.getSubject())) {
-			throw new ApiException(Error.AUTH_FAILED);
+			throw new AuthException(AuthErrorCode.ACCESS_TOKEN_NOT_EXIST);
 		}
 
 		Collection<? extends GrantedAuthority> authorities =
@@ -59,28 +59,12 @@ public class JwtProvider {
 		return new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
 	}
 
-	public String getAuthenticationByExpiredToken(String token) {
-		Claims claims = validateByExpiredToken(token);
-
-		if (StringUtils.isEmpty(claims.getSubject()))
-			throw new ApiException(Error.AUTH_FAILED);
-
-		return claims.getSubject();
-	}
-
 	public Claims validateToken(String token) {
 		Claims claims = jwtUtil.validateToken(token, false);
 		if (claims == null)
-			throw new ApiException(Error.TOKEN_VALID_FAILED);
+			throw new AuthException(AuthErrorCode.INVALID_TOKEN);
 
 		return claims;
 	}
 
-	public Claims validateByExpiredToken(String token) {
-		Claims claims = jwtUtil.validateToken(token, true);
-		if (claims == null)
-			throw new ApiException(Error.TOKEN_VALID_FAILED);
-
-		return claims;
-	}
 }

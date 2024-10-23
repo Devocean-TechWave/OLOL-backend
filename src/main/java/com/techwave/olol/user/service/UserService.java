@@ -9,10 +9,12 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.techwave.olol.global.exception.ApiException;
-import com.techwave.olol.global.exception.Error;
 import com.techwave.olol.auth.constant.AuthType;
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
 import com.techwave.olol.auth.repository.RefreshTokenRepository;
+import com.techwave.olol.global.exception.GlobalCodeException;
+import com.techwave.olol.global.exception.GlobalErrorCode;
 import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.dto.NickNameResDto;
 import com.techwave.olol.user.dto.UserDto;
@@ -51,7 +53,7 @@ public class UserService {
 	public User kakaoJoin(String id, KakaoJoinRequestDto request) {
 		User user = findById(id);
 		if (user.getAuthType() != AuthType.KAKAO)
-			throw new ApiException(Error.AUTH_TYPE_MISMATCH);
+			throw new AuthException(AuthErrorCode.AUTH_TYPE_MISMATCH);
 		user.setKakaoUser(request);
 		return userRepository.save(user);
 	}
@@ -60,7 +62,7 @@ public class UserService {
 	@Transactional
 	public UserDto updateProfileImage(String id, MultipartFile image) {
 		User user = userRepository.findById(id)
-			.orElseThrow(() -> new ApiException(Error.NOT_EXIST_USER));
+			.orElseThrow(() -> new AuthException(AuthErrorCode.USER_NOT_EXIST));
 		try {
 			Path path = Paths.get("images/profile/" + id).toAbsolutePath().normalize();
 			if (!Files.exists(path))
@@ -74,20 +76,20 @@ public class UserService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.error("profileUpload: {}, id: {}", e.getMessage(), id);
-			throw new ApiException(Error.IMAGE_UPLOAD);
+			throw new GlobalCodeException(GlobalErrorCode.IMAGE_UPLOAD_ERROR);
 		}
 		return new UserDto(user);
 	}
 
 	@Transactional
 	public void delete(String id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new ApiException(Error.NOT_EXIST_USER));
+		User user = userRepository.findById(id).orElseThrow(() -> new AuthException(AuthErrorCode.USER_NOT_EXIST));
 		user.setIsDelete(true);  // 유저 삭제 상태로 설정
 		refreshTokenRepository.deleteById(user.getId());
 		userRepository.save(user);
 	}
 
 	private User findById(String id) {
-		return userRepository.findById(id).orElseThrow(() -> new ApiException(Error.NOT_EXIST_USER));
+		return userRepository.findById(id).orElseThrow(() -> new AuthException(AuthErrorCode.USER_NOT_EXIST));
 	}
 }

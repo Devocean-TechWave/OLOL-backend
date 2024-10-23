@@ -20,6 +20,8 @@ public enum GlobalErrorCode implements BaseErrorCode {
 
 	@ExplainError("밸리데이션 (검증 과정 수행속 ) 발생하는 오류입니다.")
 	ARGUMENT_NOT_VALID_ERROR(BAD_REQUEST, "GLOBAL_400_1", "검증 오류"),
+	@ExplainError("이미지 업로드를 실패했을 때 나는 오류입니다.")
+	IMAGE_UPLOAD_ERROR(BAD_REQUEST, "GLOBAL_400_2", "이미지 업로드 오류"),
 
 	@ExplainError("500번대 알수없는 오류입니다. 서버 관리자에게 문의 주세요")
 	INTERNAL_SERVER_ERROR(INTERNAL_SERVER, "GLOBAL_500_1", "서버 오류. 관리자에게 문의 부탁드립니다."),

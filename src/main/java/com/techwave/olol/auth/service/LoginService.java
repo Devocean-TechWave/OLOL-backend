@@ -16,10 +16,10 @@ import com.techwave.olol.auth.dto.AuthTokenDto;
 import com.techwave.olol.auth.dto.TokenDto;
 import com.techwave.olol.auth.dto.reponse.KakaoAuthResponse;
 import com.techwave.olol.auth.dto.reponse.KakaoUserInfoResponse;
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
 import com.techwave.olol.auth.jwt.JwtProvider;
 import com.techwave.olol.auth.repository.RefreshTokenRepository;
-import com.techwave.olol.global.exception.ApiException;
-import com.techwave.olol.global.exception.Error;
 import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.repository.UserRepository;
 
@@ -58,7 +58,7 @@ public class LoginService {
 		} else {
 			user = userOpt.get();
 			if (user.getAuthType() != AuthType.KAKAO)
-				throw new ApiException(Error.AUTH_TYPE_MISMATCH);
+				throw new AuthException(AuthErrorCode.AUTH_TYPE_MISMATCH);
 			if (!StringUtils.isEmpty(user.getNickname()))
 				isJoined = true; // 닉네임 존재 여부로 회원가입 추가 정보 입력 화면으로 이동
 		}

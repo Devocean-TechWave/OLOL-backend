@@ -6,8 +6,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import com.techwave.olol.global.exception.ApiException;
-import com.techwave.olol.global.exception.Error;
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +23,6 @@ public class TokenAccessDeniedHandler implements AccessDeniedHandler {
 		AccessDeniedException accessDeniedException) throws IOException, ServletException {
 		log.error("[TokenAccessDeniedHandler] : {}", request);
 
-		throw new ApiException(Error.ACCESS_DENIED);
+		throw new AuthException(AuthErrorCode.INVALID_TOKEN);
 	}
 }

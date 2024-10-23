@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import com.techwave.olol.global.exception.ApiException;
-import com.techwave.olol.global.exception.Error;
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +21,6 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 		AuthenticationException authException) throws IOException, ServletException {
 		log.error("[RestAuthenticationEntryPoint] : {}", request);
 
-		throw new ApiException(Error.UNAUTHORIZED);
+		throw new AuthException(AuthErrorCode.ACCESS_TOKEN_NOT_EXIST);
 	}
 }
