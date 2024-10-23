@@ -9,17 +9,17 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.techwave.olol.auth.JwtProvider;
+import com.techwave.olol.auth.config.KakaoProperties;
 import com.techwave.olol.auth.constant.AuthType;
+import com.techwave.olol.auth.domain.RefreshToken;
 import com.techwave.olol.auth.dto.AuthTokenDto;
 import com.techwave.olol.auth.dto.TokenDto;
 import com.techwave.olol.auth.dto.reponse.KakaoAuthResponse;
 import com.techwave.olol.auth.dto.reponse.KakaoUserInfoResponse;
+import com.techwave.olol.auth.jwt.JwtProvider;
 import com.techwave.olol.auth.repository.RefreshTokenRepository;
 import com.techwave.olol.global.exception.ApiException;
 import com.techwave.olol.global.exception.Error;
-import com.techwave.olol.auth.config.KakaoProperties;
-import com.techwave.olol.auth.domain.RefreshToken;
 import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.repository.UserRepository;
 

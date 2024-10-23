@@ -1,4 +1,4 @@
-package com.techwave.olol.auth;
+package com.techwave.olol.auth.jwt;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,10 +11,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.techwave.olol.auth.config.JwtProperties;
 import com.techwave.olol.auth.dto.TokenDto;
 import com.techwave.olol.global.exception.ApiException;
 import com.techwave.olol.global.exception.Error;
-import com.techwave.olol.auth.config.JwtProperties;
 import com.techwave.olol.user.dto.SecurityUser;
 
 import io.jsonwebtoken.Claims;

@@ -12,9 +12,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.techwave.olol.auth.JwtAuthenticationFilter;
-import com.techwave.olol.auth.JwtProvider;
-import com.techwave.olol.auth.TokenAccessDeniedHandler;
+import com.techwave.olol.auth.jwt.JwtAuthenticationFilter;
+import com.techwave.olol.auth.jwt.JwtProvider;
+import com.techwave.olol.auth.jwt.TokenAccessDeniedHandler;
 
 import lombok.RequiredArgsConstructor;
 

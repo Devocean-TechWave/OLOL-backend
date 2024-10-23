@@ -1,4 +1,4 @@
-package com.techwave.olol.auth;
+package com.techwave.olol.auth.jwt;
 
 import java.security.Key;
 import java.util.Date;
