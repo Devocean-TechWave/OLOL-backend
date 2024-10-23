@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -12,9 +13,10 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.techwave.olol.auth.exception.AuthErrorCode;
-import com.techwave.olol.auth.exception.AuthException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.techwave.olol.auth.util.RequestUtil;
+import com.techwave.olol.global.dto.ErrorResponse;
+import com.techwave.olol.global.exception.GlobalErrorCode;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -44,9 +46,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
-			log.error("[JwtAuthenticationFilter] message: {}", e.getMessage());
-			throw new AuthException(AuthErrorCode.INVALID_TOKEN);
+			log.error("[JwtAuthenticationFilter] Error: {}", e.getMessage());
+			setErrorResponse(request, response, GlobalErrorCode.IMAGE_UPLOAD_ERROR);
+			// 필터 체인을 진행하지 않고 에러를 클라이언트로 보냄
 		}
+	}
+
+	private void setErrorResponse(
+		HttpServletRequest request,
+		HttpServletResponse response,
+		GlobalErrorCode errorCode
+	) throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.findAndRegisterModules();
+		response.setStatus(errorCode.getErrorReason().getStatus());
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+		response.setCharacterEncoding("UTF-8"); // 한글 처리를 위한 UTF-8 인코딩 설정
+		ErrorResponse errorResponse = new ErrorResponse(errorCode.getErrorReason(), request.getServletPath());
+		// sendError로 상태 코드와 응답을 전달
+		System.out.println("errorResponse: " + objectMapper.writeValueAsString(errorResponse));
+		response.sendError(errorCode.getErrorReason().getStatus(), objectMapper.writeValueAsString(errorResponse));
 	}
 
 	private boolean checkAuthRequired(HttpServletRequest request) {
@@ -56,6 +76,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				.collect(Collectors.toList())));
 		return rm.matcher(request).isMatch();
 	}
-
-	//
 }

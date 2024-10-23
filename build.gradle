@@ -88,6 +88,8 @@ dependencies {
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine')
     testImplementation 'org.springframework.security:spring-security-test'
     implementation 'mysql:mysql-connector-java:8.0.28'
+
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {
