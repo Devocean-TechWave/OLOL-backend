@@ -1,7 +1,10 @@
 package com.techwave.olol.family.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.techwave.olol.family.domain.Family;
+import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.dto.UserInfoDto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,5 +23,21 @@ public class FamilyInfoDto {
 	private Long score;
 
 	@Schema(description = "가족 구성원")
-	List<UserInfoDto> familyMembers;
+	List<UserInfoDto> familyMembers = new ArrayList<>();
+
+	void setFamilyMembers(List<User> users) {
+		for (User user : users) {
+			familyMembers.add(UserInfoDto.fromEntity(user));
+		}
+	}
+
+	public static FamilyInfoDto fromEntity(Family family) {
+		FamilyInfoDto familyInfoDto = new FamilyInfoDto();
+		familyInfoDto.setFamilyId(family.getId());
+		familyInfoDto.setFamilyName(family.getName());
+		familyInfoDto.setScore(family.getScore());
+		familyInfoDto.setFamilyMembers(family.getUsers());
+		return familyInfoDto;
+	}
+
 }

@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
 			log.error("[JwtAuthenticationFilter] Error: {}", e.getMessage());
-			setErrorResponse(request, response, GlobalErrorCode.IMAGE_UPLOAD_ERROR);
+			// setErrorResponse(request, response, GlobalErrorCode.IMAGE_UPLOAD_ERROR);
 			// 필터 체인을 진행하지 않고 에러를 클라이언트로 보냄
 		}
 	}

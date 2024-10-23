@@ -5,9 +5,9 @@ import java.time.LocalDate;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.techwave.olol.auth.constant.AuthType;
 import com.techwave.olol.family.domain.Family;
 import com.techwave.olol.global.jpa.BaseEntity;
-import com.techwave.olol.auth.constant.AuthType;
 import com.techwave.olol.user.dto.request.KakaoJoinRequestDto;
 
 import jakarta.persistence.Column;
@@ -68,6 +68,7 @@ public class User extends BaseEntity {
 	private String snsId; // kakao 로그인 ID
 
 	@Column(name = "role")
+	@Setter
 	private String role;
 
 	@Column(name = "is_delete")
@@ -77,6 +78,7 @@ public class User extends BaseEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "family_id")
+	@Setter
 	private Family family;
 
 	@Builder

@@ -2,6 +2,7 @@ package com.techwave.olol.mission.domain;
 
 import java.time.LocalDate;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.techwave.olol.family.domain.Family;
@@ -40,7 +41,8 @@ public class Memory extends BaseEntity {
 	private String createImageUrl;
 
 	@Column(name = "score")
-	private Long score;
+	@ColumnDefault("0")
+	private Long score = 0L;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "family_id")

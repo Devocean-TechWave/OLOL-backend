@@ -70,7 +70,7 @@ public class UserService {
 			String fileName =
 				"profile." + image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf(".") + 1);
 			Files.copy(image.getInputStream(), path.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
-			String profileUrl = "/images/profile/" + id + "/" + fileName;
+			String profileUrl = "/images/profile/" + user.getNickname() + "/" + fileName;
 			user.setProfileUrl(profileUrl);
 			userRepository.save(user);
 		} catch (Exception e) {

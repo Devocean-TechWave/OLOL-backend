@@ -1,7 +1,9 @@
 package com.techwave.olol.family.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.techwave.olol.global.jpa.BaseEntity;
@@ -17,6 +19,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,24 +28,35 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "family")
+@Builder
+@AllArgsConstructor
 @Getter
 public class Family extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "name")
+	@Column(name = "name", unique = true, nullable = false)
 	private String name;
 
 	@Column(name = "score")
-	private Long score;
+	@ColumnDefault("0")
+	@Builder.Default
+	private Long score = 0L;
 
 	@Column(name = "is_delete")
-	private boolean isDeleted;
+	private boolean isDeleted = false;
 
 	@OneToMany(mappedBy = "family")
-	private List<User> users;
+	@Builder.Default
+	private List<User> users = new ArrayList<>();
 
 	@OneToMany(mappedBy = "family")
-	private List<Memory> familyMissions;
+	@Builder.Default
+	private List<Memory> familyMissions = new ArrayList<>();
+
+	public void addUser(User user) {
+		users.add(user);
+		user.setFamily(this);
+	}
 }
