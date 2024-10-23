@@ -10,6 +10,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.techwave.olol.global.exception.GlobalCodeException;
+import com.techwave.olol.global.exception.GlobalErrorCode;
 import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.mission.dto.request.ReqMissionDto;
 
@@ -79,7 +81,7 @@ public class Mission extends BaseEntity {
 	@PreUpdate
 	private void validateDates() {
 		if (this.startAt.isAfter(this.endAt)) {
-			throw new IllegalArgumentException("Start date must be before end date");
+			throw new GlobalCodeException(GlobalErrorCode.START_DATE_AFTER_END_DATE);
 		}
 	}
 

@@ -12,6 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
+import com.techwave.olol.global.exception.GlobalCodeException;
+import com.techwave.olol.global.exception.GlobalErrorCode;
 import com.techwave.olol.mission.domain.Mission;
 import com.techwave.olol.mission.dto.MemoryResDto;
 import com.techwave.olol.mission.dto.MissionResDto;
@@ -44,7 +48,7 @@ public class MissionService {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
 		if (user.getFamily() == null) {
-			throw new IllegalArgumentException("가족에 가입되어 있지 않습니다.");
+			throw new AuthException(AuthErrorCode.NO_FAMILY);
 		}
 		// 미션 조회
 		// Mission mission = missionRepository.findById(missionId)
@@ -52,7 +56,7 @@ public class MissionService {
 
 		// 파일 타입 체크
 		if (!isValidFileType(multipartFile)) {
-			throw new IllegalArgumentException("이미지 또는 영상 파일만 업로드할 수 있습니다.");
+			throw new GlobalCodeException(GlobalErrorCode.FILE_ONLY_IMAGE);
 		}
 
 		// 이미지 저장 및 URL 반환
@@ -159,7 +163,7 @@ public class MissionService {
 
 	private boolean isValidFileType(MultipartFile file) {
 		String contentType = file.getContentType();
-		return contentType != null && (contentType.startsWith("image/") || contentType.startsWith("video/"));
+		return contentType != null && (contentType.startsWith("image/"));
 	}
 
 	private File convert(MultipartFile file) throws IOException {

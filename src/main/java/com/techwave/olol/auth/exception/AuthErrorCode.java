@@ -34,7 +34,9 @@ public enum AuthErrorCode implements BaseErrorCode {
 	@ExplainError("이미지가 없는 경우 발생하는 오류입니다.")
 	IMAGE_NOT_EXIST(NOT_FOUND, "AUTH_404_1", "이미지가 없습니다."),
 	@ExplainError("유저가 없을 때 나타나는 오류입니다.")
-	USER_NOT_EXIST(NOT_FOUND, "AUTH_404_2", "유저가 없습니다.");
+	USER_NOT_EXIST(NOT_FOUND, "AUTH_404_2", "유저가 없습니다."),
+	@ExplainError("이메일이 중복될 때 나타나는 오류입니다.")
+	EMAIL_DUPLICATION(CONFLICT, "AUTH_409_1", "이미 사용중인 이메일입니다.");
 
 	private final Integer status;
 	private final String code;

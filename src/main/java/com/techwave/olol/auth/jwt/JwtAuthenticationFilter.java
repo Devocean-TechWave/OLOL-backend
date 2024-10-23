@@ -6,13 +6,14 @@ import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
 import com.techwave.olol.auth.util.RequestUtil;
 
 import jakarta.servlet.FilterChain;
@@ -44,7 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
 			log.error("[JwtAuthenticationFilter] message: {}", e.getMessage());
-			throw new UsernameNotFoundException("authentication failed.");
+			throw new AuthException(AuthErrorCode.INVALID_TOKEN);
 		}
 	}
 

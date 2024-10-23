@@ -36,6 +36,9 @@ public enum GlobalErrorCode implements BaseErrorCode {
 	SECURITY_CONTEXT_NOT_FOUND(500, "GLOBAL_500_2", "SecurityContext를 찾을 수 없습니다."),
 
 	BAD_FILE_EXTENSION(BAD_REQUEST, "FILE_400_1", "파일 확장자가 잘못 되었습니다."),
+	FILE_ONLY_IMAGE(BAD_REQUEST, "FILE_400_2", "이미지 파일만 업로드 가능합니다."),
+	DATE_FORMAT_ERROR(BAD_REQUEST, "DATE_400_1", "날짜 형식이 잘못 되었습니다."),
+	START_DATE_AFTER_END_DATE(BAD_REQUEST, "DATE_400_2", "시작 날짜가 종료 날짜보다 늦습니다."),
 	TOO_MANY_REQUEST(429, "GLOBAL_429_1", "과도한 요청을 보내셨습니다. 잠시 기다려 주세요.");
 
 	private final Integer status;

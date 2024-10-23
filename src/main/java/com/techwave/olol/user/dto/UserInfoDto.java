@@ -2,6 +2,8 @@ package com.techwave.olol.user.dto;
 
 import java.time.LocalDate;
 
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
 import com.techwave.olol.user.domain.GenderType;
 import com.techwave.olol.user.domain.User;
 
@@ -35,6 +37,10 @@ public class UserInfoDto {
 
 	// User 엔티티에서 UserInfoDto로 변환하는 정적 팩토리 메소드
 	public static UserInfoDto fromEntity(User user) {
+		if (user == null)
+			throw new AuthException(AuthErrorCode.USER_NOT_EXIST);
+		if (user.getFamily() == null)
+			throw new AuthException(AuthErrorCode.NO_FAMILY);
 		return UserInfoDto.builder()
 			.id(user.getId())
 			.name(user.getName())
