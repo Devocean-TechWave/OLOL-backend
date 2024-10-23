@@ -10,8 +10,6 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.techwave.olol.global.exception.GlobalCodeException;
-import com.techwave.olol.global.exception.GlobalErrorCode;
 import com.techwave.olol.global.jpa.BaseEntity;
 import com.techwave.olol.mission.dto.request.ReqMissionDto;
 
@@ -22,8 +20,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Entity
 @Slf4j
 @SQLRestriction("is_delete = false")
-@SQLDelete(sql = "UPDATE Mission SET is_delete = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE mission SET is_delete = true WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
@@ -50,11 +46,8 @@ public class Mission extends BaseEntity {
 	@Column(columnDefinition = "BINARY(16)")
 	private UUID id;
 
-	@Column(name = "start_at", nullable = false, columnDefinition = "DATE")
-	private LocalDate startAt;
-
-	@Column(name = "end_at", nullable = false, columnDefinition = "DATE")
-	private LocalDate endAt;
+	@Column(name = "mission_date", nullable = false, columnDefinition = "DATE")
+	private LocalDate date;
 
 	@Column(name = "name", nullable = false)
 	private String name;
@@ -73,16 +66,8 @@ public class Mission extends BaseEntity {
 	@OneToMany(mappedBy = "mission")
 	private List<Memory> memories = new ArrayList<>();
 
-	public void addSuccessStamp(Memory memory) {
+	public void addMemory(Memory memory) {
 		this.memories.add(memory);
-	}
-
-	@PrePersist
-	@PreUpdate
-	private void validateDates() {
-		if (this.startAt.isAfter(this.endAt)) {
-			throw new GlobalCodeException(GlobalErrorCode.START_DATE_AFTER_END_DATE);
-		}
 	}
 
 	// 생성 메서드
@@ -90,8 +75,15 @@ public class Mission extends BaseEntity {
 		return Mission.builder()
 			.name(request.getName())
 			.description(request.getDescription())
-
+			.point(request.getPoint())
 			.build();
+	}
+
+	// 수정 메서드
+	public void updateByReqDto(ReqMissionDto request) {
+		this.name = request.getName();
+		this.description = request.getDescription();
+		this.point = request.getPoint();
 	}
 
 	// 삭제 메서드

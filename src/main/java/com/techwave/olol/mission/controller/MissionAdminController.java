@@ -41,10 +41,9 @@ public class MissionAdminController {
 	// 미션 등록
 	@Operation(summary = "미션 등록(관리자용)", description = "미션을 만들어서 등록합니다.")
 	@PostMapping
-	public ResponseEntity<StringResDto> registerMission(@AuthenticationPrincipal SecurityUser user,
+	public ResponseEntity<MissionResDto> registerMission(@AuthenticationPrincipal SecurityUser user,
 		@RequestBody ReqMissionDto reqMissionDto) {
-		missionService.createMission(reqMissionDto);
-		return ResponseEntity.ok(new StringResDto("미션이 생성되었습니다."));
+		return ResponseEntity.ok(missionService.createMission(reqMissionDto));
 	}
 
 	// 미션 삭제
@@ -58,10 +57,9 @@ public class MissionAdminController {
 
 	@Operation(summary = "미션 수정(관리자용)", description = "미션을 수정합니다.")
 	@PutMapping("/update/{missionId}")
-	public ResponseEntity<StringResDto> updateMission(@AuthenticationPrincipal SecurityUser user,
+	public ResponseEntity<MissionResDto> updateMission(@AuthenticationPrincipal SecurityUser user,
 		@PathVariable UUID missionId, @RequestBody ReqMissionDto reqMissionDto) {
-		missionService.updateMission(reqMissionDto, missionId);
-		return ResponseEntity.ok(new StringResDto("미션이 수정되었습니다."));
+		return ResponseEntity.ok(missionService.updateMission(reqMissionDto, missionId));
 	}
 
 }

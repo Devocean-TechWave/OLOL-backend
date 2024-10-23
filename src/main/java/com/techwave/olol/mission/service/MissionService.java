@@ -94,7 +94,10 @@ public class MissionService {
 	public MissionResDto getTodayMission(String userId) {
 		// 유저 조회
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
+			.orElseThrow(() -> new AuthException(AuthErrorCode.USER_NOT_EXIST));
+		if (user.getFamily() == null) {
+			throw new AuthException(AuthErrorCode.NO_FAMILY);
+		}
 
 		// LocalDate today = LocalDate.now();
 		// List<Mission> missions = missionRepository.findTodayMission(user, today);

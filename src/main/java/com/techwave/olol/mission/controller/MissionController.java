@@ -36,7 +36,6 @@ public class MissionController {
 	@Operation(summary = "오늘 수행 중인 미션 조회", description = "오늘에 해당하는 미션을 조회합니다. 이미 미션이 끝났다면 조회되지 않습니다.")
 	@GetMapping("/today")
 	public ResponseEntity<MissionResDto> getProgressMission(@AuthenticationPrincipal SecurityUser user) {
-		// user.getUsername() -> userId
 		return ResponseEntity.ok(missionService.getTodayMission(user.getUsername()));
 	}
 
