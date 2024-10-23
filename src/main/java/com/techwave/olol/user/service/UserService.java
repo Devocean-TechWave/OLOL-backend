@@ -7,18 +7,16 @@ import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.techwave.olol.global.exception.ApiException;
 import com.techwave.olol.global.exception.Error;
 import com.techwave.olol.login.constant.AuthType;
 import com.techwave.olol.login.repository.RefreshTokenRepository;
-import com.techwave.olol.user.domain.GenderType;
 import com.techwave.olol.user.domain.User;
+import com.techwave.olol.user.dto.NickNameResDto;
 import com.techwave.olol.user.dto.UserDto;
 import com.techwave.olol.user.dto.UserInfoDto;
-import com.techwave.olol.user.dto.request.EditUserRequest;
 import com.techwave.olol.user.dto.request.KakaoJoinRequestDto;
 import com.techwave.olol.user.repository.UserRepository;
 
@@ -44,52 +42,40 @@ public class UserService {
 		return userOpt.map(UserDto::new).orElse(null);
 	}
 
-	public boolean checkNickname(String nickname) {
+	public NickNameResDto checkNickname(String nickname) {
 		Optional<User> userOpt = userRepository.findByNickname(nickname);
-		return userOpt.isEmpty();
+		return new NickNameResDto(nickname, userOpt.isPresent());
 	}
 
-	// 성별 예외처리 코드 추가
 	@Transactional
-	public String kakaoJoin(String id, KakaoJoinRequestDto request) {
+	public User kakaoJoin(String id, KakaoJoinRequestDto request) {
 		User user = findById(id);
 		if (user.getAuthType() != AuthType.KAKAO)
 			throw new ApiException(Error.AUTH_TYPE_MISMATCH);
-
-		if (!GenderType.MALE.equals(request.getGender()) && !GenderType.FEMALE.equals(request.getGender())) {
-			throw new ApiException(Error.INVALID_DATA);
-		}
-
 		user.setKakaoUser(request);
-
-		User savedUser = userRepository.save(user);
-		return savedUser.getId();
+		return userRepository.save(user);
 	}
 
+	//TODO: S3 이미지 업로드로 변경
 	@Transactional
-	public UserDto edit(String id, EditUserRequest data, MultipartFile file) {
-		User user = userRepository.findById(id).orElseThrow(() -> new ApiException(Error.NOT_EXIST_USER));
-		if (data != null && !StringUtils.isEmpty(data.getNickname()) && checkNickname(data.getNickname())) {
-			user.setNickname(data.getNickname());
-		}
-
+	public UserDto updateProfileImage(String id, MultipartFile image) {
+		User user = userRepository.findById(id)
+			.orElseThrow(() -> new ApiException(Error.NOT_EXIST_USER));
 		try {
-			if (file != null && !file.isEmpty()) {
-				Path path = Paths.get("images/profile/" + user.getId()).toAbsolutePath().normalize();
-				if (!Files.exists(path))
-					Files.createDirectory(path);
-				String fileName =
-					"profile." + file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".") + 1);
-				Files.copy(file.getInputStream(), path.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
-				user.setProfileUrl("/images/profile/" + user.getId() + "/" + fileName);
-			}
+			Path path = Paths.get("images/profile/" + id).toAbsolutePath().normalize();
+			if (!Files.exists(path))
+				Files.createDirectory(path);
+			String fileName =
+				"profile." + image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf(".") + 1);
+			Files.copy(image.getInputStream(), path.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+			String profileUrl = "/images/profile/" + id + "/" + fileName;
+			user.setProfileUrl(profileUrl);
+			userRepository.save(user);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.error("profileUpload: {}, id: {}", e.getMessage(), user.getId());
+			log.error("profileUpload: {}, id: {}", e.getMessage(), id);
 			throw new ApiException(Error.IMAGE_UPLOAD);
 		}
-
-		user = userRepository.save(user);
 		return new UserDto(user);
 	}
 

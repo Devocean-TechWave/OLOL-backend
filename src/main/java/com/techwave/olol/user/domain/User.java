@@ -72,6 +72,7 @@ public class User extends BaseEntity {
 
 	@Column(name = "is_delete")
 	@ColumnDefault("false")
+	@Builder.Default
 	private Boolean isDelete = false;
 
 	@ManyToOne
@@ -80,21 +81,17 @@ public class User extends BaseEntity {
 
 	@Builder
 	public User(AuthType authType, String snsId) {
-		this.profileUrl = "default_profile.PNG";
+		this.profileUrl = "default_profile.png";
 		this.authType = authType;
 		this.snsId = snsId;
 		this.isDelete = false;
-	}
-
-	public boolean isDelete() {
-		return isDelete;
 	}
 
 	public void setKakaoUser(KakaoJoinRequestDto request) {
 		this.name = request.getName();
 		this.nickname = request.getNickname();
 		this.birth = request.getBirth();
-		this.gender = GenderType.MALE.getName().equals(request.getGender()) ? GenderType.MALE : GenderType.FEMALE;
+		this.gender = request.getGender();
 	}
 
 	public void setIsDelete(boolean isDelete) {

@@ -1,5 +1,7 @@
 package com.techwave.olol.user.dto;
 
+import java.time.LocalDate;
+
 import com.techwave.olol.user.domain.GenderType;
 import com.techwave.olol.user.domain.User;
 
@@ -23,7 +25,7 @@ public class UserInfoDto {
 
 	//아이디, 응답, 이름,프로필 사진, 닉네임, 생년월일, 성별, 가족명, 역할
 	@Schema(description = "유저 생년월일", example = "1990-01-01")
-	private String birth;
+	private LocalDate birth;
 	@Schema(description = "유저 성별", example = "남자")
 	private GenderType gender;
 	@Schema(description = "유저 가족명", example = "홍길동 가족")
@@ -38,6 +40,10 @@ public class UserInfoDto {
 			.name(user.getName())
 			.nickname(user.getNickname())
 			.profileUrl(user.getProfileUrl())
+			.birth(user.getBirth())
+			.gender(user.getGender())
+			.familyName(user.getFamily().getName())
+			.role(user.getRole())
 			.build();
 	}
 }

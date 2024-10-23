@@ -25,7 +25,7 @@ public class UserDto {
 	@Schema(example = "닉네임")
 	private String nickname;
 
-	@Schema(example = "http://localhost:8080/apidefault_profile.PNG")
+	@Schema(example = "http://localhost:8080/api/default_profile.PNG")
 	private String profileUrl;
 
 	@Schema(example = "2024-07-27")
@@ -49,7 +49,7 @@ public class UserDto {
 
 		String nickname = user.getNickname();
 		// 탈퇴한 유저 닉네임 처리로직
-		if (user.isDelete())
+		if (user.getIsDelete())
 			nickname = "[탈퇴한 유저]";
 		this.nickname = nickname;
 
@@ -61,7 +61,7 @@ public class UserDto {
 		this.profileUrl = imageUrl;
 		this.birth = user.getBirth();
 		this.gender = user.getGender();
-		this.isDelete = user.isDelete();
+		this.isDelete = user.getIsDelete();
 		this.createdTime = user.getCreatedTime();
 		this.updatedTime = user.getUpdatedTime();
 	}
