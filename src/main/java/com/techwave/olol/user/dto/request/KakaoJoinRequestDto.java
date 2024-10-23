@@ -24,7 +24,7 @@ public class KakaoJoinRequestDto {
 	@Schema(description = "생년월일", example = "1990-01-01")
 	private LocalDate birth;
 	@NotNull
-	@Schema(description = "성별", example = "M")
+	@Schema(description = "성별", example = "MALE")
 	private GenderType gender;
-	
+
 }

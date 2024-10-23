@@ -13,6 +13,7 @@ import lombok.Setter;
 @Configuration
 @ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
+	private String secretKey;
 	private Long accessTokenDuration;
 	private Long refreshTokenDuration;
 }

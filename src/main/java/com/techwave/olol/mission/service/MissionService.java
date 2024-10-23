@@ -43,7 +43,9 @@ public class MissionService {
 		// 유저 조회
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("해당 닉네임의 유저를 찾을 수 없습니다: " + userId));
-
+		if (user.getFamily() == null) {
+			throw new IllegalArgumentException("가족에 가입되어 있지 않습니다.");
+		}
 		// 미션 조회
 		// Mission mission = missionRepository.findById(missionId)
 		// 	.orElseThrow(() -> new IllegalArgumentException("해당 ID의 미션을 찾을 수 없습니다: " + missionId));
