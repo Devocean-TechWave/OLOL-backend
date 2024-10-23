@@ -11,8 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.techwave.olol.global.exception.ApiException;
 import com.techwave.olol.global.exception.Error;
-import com.techwave.olol.login.constant.AuthType;
-import com.techwave.olol.login.repository.RefreshTokenRepository;
+import com.techwave.olol.auth.constant.AuthType;
+import com.techwave.olol.auth.repository.RefreshTokenRepository;
 import com.techwave.olol.user.domain.User;
 import com.techwave.olol.user.dto.NickNameResDto;
 import com.techwave.olol.user.dto.UserDto;

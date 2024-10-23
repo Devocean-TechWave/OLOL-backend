@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.techwave.olol.login.dto.AuthTokenDto;
-import com.techwave.olol.login.service.LoginService;
+import com.techwave.olol.auth.dto.AuthTokenDto;
+import com.techwave.olol.auth.service.LoginService;
 import com.techwave.olol.user.dto.NickNameResDto;
 import com.techwave.olol.user.dto.UserDto;
 import com.techwave.olol.user.dto.UserInfoDto;
