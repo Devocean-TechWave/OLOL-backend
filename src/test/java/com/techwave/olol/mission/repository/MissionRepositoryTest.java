@@ -47,8 +47,6 @@ class MissionRepositoryTest {
 			.startAt(LocalDate.of(2021, 1, 1))
 			.endAt(LocalDate.of(2021, 1, 2))
 			.name("name")
-			.emoji("👍")
-			.successQuota(10)
 			.build();
 
 		// when
@@ -57,10 +55,6 @@ class MissionRepositoryTest {
 		// then
 		assertThat(savedMission.getId()).isNotNull();
 		assertThat(savedMission.getName()).isEqualTo("name");
-		assertThat(savedMission.getEmoji()).isEqualTo("👍");
-		assertThat(savedMission.getSuccessQuota()).isEqualTo(10);
-		assertThat(savedMission.isSuccess()).isFalse();
-		assertThat(savedMission.isImageRequired()).isFalse();
 	}
 
 	@Test
@@ -71,8 +65,6 @@ class MissionRepositoryTest {
 			.startAt(LocalDate.of(2021, 1, 1))
 			.endAt(LocalDate.of(2021, 1, 2))
 			.name("name")
-			.emoji("👍")
-			.successQuota(10)
 			.build();
 		Mission savedMission = missionRepository.save(mission);
 
@@ -92,8 +84,6 @@ class MissionRepositoryTest {
 			.startAt(LocalDate.of(2021, 1, 2))
 			.endAt(LocalDate.of(2021, 1, 1))
 			.name("name")
-			.emoji("👍")
-			.successQuota(10)
 			.build();
 
 		// when, then

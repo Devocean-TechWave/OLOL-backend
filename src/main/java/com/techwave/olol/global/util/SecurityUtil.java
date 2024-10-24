@@ -4,6 +4,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
 import com.techwave.olol.user.dto.SecurityUser;
 
 public class SecurityUtil {
@@ -17,7 +19,7 @@ public class SecurityUtil {
 		if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
 			return (UserDetails)authentication.getPrincipal();
 		}
-		throw new IllegalStateException("User not authenticated");
+		throw new AuthException(AuthErrorCode.INVALID_TOKEN);
 	}
 
 	public static String getCurrentUserId() {
@@ -25,7 +27,7 @@ public class SecurityUtil {
 		if (userDetails instanceof SecurityUser) {  // Assuming SecurityUser extends UserDetails
 			return ((SecurityUser)userDetails).getUsername();
 		}
-		throw new IllegalStateException("UserDetails does not contain userId");
+		throw new AuthException(AuthErrorCode.INVALID_TOKEN);
 	}
 }
 

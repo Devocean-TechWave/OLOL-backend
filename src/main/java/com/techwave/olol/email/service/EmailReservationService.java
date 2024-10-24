@@ -2,10 +2,10 @@ package com.techwave.olol.email.service;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
 import com.techwave.olol.email.domain.EmailReservation;
 import com.techwave.olol.email.dto.EmailDto;
 import com.techwave.olol.email.repository.EmailReservationRepository;
@@ -20,7 +20,7 @@ public class EmailReservationService {
 
 	public EmailReservation saveEmail(String email) {
 		if (emailReservationRepository.findByEmail(email).isPresent()) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+			throw new AuthException(AuthErrorCode.EMAIL_DUPLICATION);
 		}
 		EmailReservation emailReservation = new EmailReservation();
 		emailReservation.setEmail(email);

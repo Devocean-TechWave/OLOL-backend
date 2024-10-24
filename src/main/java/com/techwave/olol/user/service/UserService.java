@@ -7,17 +7,18 @@ import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.techwave.olol.global.exception.ApiException;
-import com.techwave.olol.global.exception.Error;
-import com.techwave.olol.login.constant.AuthType;
-import com.techwave.olol.login.repository.RefreshTokenRepository;
-import com.techwave.olol.user.domain.GenderType;
+import com.techwave.olol.auth.constant.AuthType;
+import com.techwave.olol.auth.exception.AuthErrorCode;
+import com.techwave.olol.auth.exception.AuthException;
+import com.techwave.olol.auth.repository.RefreshTokenRepository;
+import com.techwave.olol.global.exception.GlobalCodeException;
+import com.techwave.olol.global.exception.GlobalErrorCode;
 import com.techwave.olol.user.domain.User;
+import com.techwave.olol.user.dto.NickNameResDto;
 import com.techwave.olol.user.dto.UserDto;
-import com.techwave.olol.user.dto.request.EditUserRequest;
+import com.techwave.olol.user.dto.UserInfoDto;
 import com.techwave.olol.user.dto.request.KakaoJoinRequestDto;
 import com.techwave.olol.user.repository.UserRepository;
 
@@ -33,9 +34,9 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
 
-	public UserDto getUser(String id) {
+	public UserInfoDto getUser(String id) {
 		User user = findById(id);
-		return new UserDto(user);
+		return UserInfoDto.fromEntity(user);
 	}
 
 	public UserDto findByNickname(String nickname) {
@@ -43,63 +44,52 @@ public class UserService {
 		return userOpt.map(UserDto::new).orElse(null);
 	}
 
-	public boolean checkNickname(String nickname) {
+	public NickNameResDto checkNickname(String nickname) {
 		Optional<User> userOpt = userRepository.findByNickname(nickname);
-		return userOpt.isEmpty();
+		return new NickNameResDto(nickname, userOpt.isPresent());
 	}
 
-	// 성별 예외처리 코드 추가
 	@Transactional
-	public void kakaoJoin(String id, KakaoJoinRequestDto request) {
+	public User kakaoJoin(String id, KakaoJoinRequestDto request) {
 		User user = findById(id);
 		if (user.getAuthType() != AuthType.KAKAO)
-			throw new ApiException(Error.AUTH_TYPE_MISMATCH);
-
-		if (!GenderType.MALE.equals(request.getGender()) && !GenderType.FEMALE.equals(request.getGender())) {
-			throw new ApiException(Error.INVALID_DATA);
-		}
-
+			throw new AuthException(AuthErrorCode.AUTH_TYPE_MISMATCH);
 		user.setKakaoUser(request);
-
-		userRepository.save(user);
+		return userRepository.save(user);
 	}
 
+	//TODO: S3 이미지 업로드로 변경
 	@Transactional
-	public UserDto edit(String id, EditUserRequest data, MultipartFile file) {
-		User user = userRepository.findById(id).orElseThrow(() -> new ApiException(Error.NOT_EXIST_USER));
-		if (data != null && !StringUtils.isEmpty(data.getNickname()) && checkNickname(data.getNickname())) {
-			user.setNickname(data.getNickname());
-		}
-
+	public UserDto updateProfileImage(String id, MultipartFile image) {
+		User user = userRepository.findById(id)
+			.orElseThrow(() -> new AuthException(AuthErrorCode.USER_NOT_EXIST));
 		try {
-			if (file != null && !file.isEmpty()) {
-				Path path = Paths.get("images/profile/" + user.getId()).toAbsolutePath().normalize();
-				if (!Files.exists(path))
-					Files.createDirectory(path);
-				String fileName =
-					"profile." + file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".") + 1);
-				Files.copy(file.getInputStream(), path.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
-				user.setProfileUrl("/images/profile/" + user.getId() + "/" + fileName);
-			}
+			Path path = Paths.get("images/profile/" + id).toAbsolutePath().normalize();
+			if (!Files.exists(path))
+				Files.createDirectory(path);
+			String fileName =
+				"profile." + image.getOriginalFilename().substring(image.getOriginalFilename().lastIndexOf(".") + 1);
+			Files.copy(image.getInputStream(), path.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
+			String profileUrl = "/images/profile/" + user.getNickname() + "/" + fileName;
+			user.setProfileUrl(profileUrl);
+			userRepository.save(user);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.error("profileUpload: {}, id: {}", e.getMessage(), user.getId());
-			throw new ApiException(Error.IMAGE_UPLOAD);
+			log.error("profileUpload: {}, id: {}", e.getMessage(), id);
+			throw new GlobalCodeException(GlobalErrorCode.IMAGE_UPLOAD_ERROR);
 		}
-
-		user = userRepository.save(user);
 		return new UserDto(user);
 	}
 
 	@Transactional
 	public void delete(String id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new ApiException(Error.NOT_EXIST_USER));
+		User user = userRepository.findById(id).orElseThrow(() -> new AuthException(AuthErrorCode.USER_NOT_EXIST));
 		user.setIsDelete(true);  // 유저 삭제 상태로 설정
 		refreshTokenRepository.deleteById(user.getId());
 		userRepository.save(user);
 	}
 
 	private User findById(String id) {
-		return userRepository.findById(id).orElseThrow(() -> new ApiException(Error.NOT_EXIST_USER));
+		return userRepository.findById(id).orElseThrow(() -> new AuthException(AuthErrorCode.USER_NOT_EXIST));
 	}
 }
