@@ -1,7 +1,5 @@
 package com.techwave.olol.mission.domain;
 
-import java.time.LocalDate;
-
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -18,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +27,8 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
+@Builder
+@AllArgsConstructor
 public class Memory extends BaseEntity {
 
 	@Id
@@ -52,12 +53,6 @@ public class Memory extends BaseEntity {
 	@JoinColumn(name = "mission_id")
 	@Setter
 	private Mission mission;
-
-	@Builder
-	public Memory(Mission mission, String imageUrl, LocalDate successDate) {
-		this.mission = mission;
-		this.imageUrl = imageUrl;
-	}
 
 }
 

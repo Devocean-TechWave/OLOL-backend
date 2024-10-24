@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.util.Objects;
 
 import com.techwave.olol.global.annotation.ExplainError;
+import com.techwave.olol.global.config.OlOlStatic;
 import com.techwave.olol.global.dto.ErrorReason;
 import com.techwave.olol.global.interfaces.BaseErrorCode;
 
@@ -25,6 +26,7 @@ public enum GlobalErrorCode implements BaseErrorCode {
 
 	@ExplainError("500번대 알수없는 오류입니다. 서버 관리자에게 문의 주세요")
 	INTERNAL_SERVER_ERROR(INTERNAL_SERVER, "GLOBAL_500_1", "서버 오류. 관리자에게 문의 부탁드립니다."),
+	UNAUTHORIZED(OlOlStatic.UNAUTHORIZED, "GLOBAL_401_1", "인증되지 않은 사용자입니다."),
 
 	OTHER_SERVER_BAD_REQUEST(BAD_REQUEST, "FEIGN_400_1", "다른 서버로 한 요청이 Bad Request 입니다."),
 	OTHER_SERVER_UNAUTHORIZED(BAD_REQUEST, "FEIGN_400_2", "다른 서버로 한 요청이 Unauthorized 입니다."),

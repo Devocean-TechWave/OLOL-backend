@@ -42,24 +42,19 @@ public class MissionController {
 	// 미션 인증
 	@Operation(summary = "미션 인증", description = "미션을 인증합니다.")
 	@PostMapping("/verification/{missionId}")
-	public ResponseEntity<StringResDto> verifyMission(@AuthenticationPrincipal SecurityUser user,
+	public ResponseEntity<MemoryResDto> verifyMission(@AuthenticationPrincipal SecurityUser user,
 		@PathVariable("missionId") UUID missionId,
 		@RequestParam("file") MultipartFile file) {
-		try {
-			missionService.verifyMission(user.getUsername(), missionId, file);
-			return ResponseEntity.ok(new StringResDto("미션이 인증되었습니다."));
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(new StringResDto("미션 인증에 실패했습니다: " + e.getMessage()));
-		}
+		return ResponseEntity.ok(missionService.verifyMission(user.getUsername(), missionId, file));
 	}
 
-	// 미션 조회
+	//TODO: AI 완성되고 하기
 	@Operation(summary = "테마 사진 생성", description = "테마 사진을 생성합니다.")
 	@PostMapping("/theme")
 	public ResponseEntity<StringResDto> createTheme(@RequestParam("file") String imageUrl) {
 		try {
 			missionService.createTheme(imageUrl);
-			return ResponseEntity.ok(new StringResDto("테마 사진이 생성되었습니다."));
+			return ResponseEntity.ok(new StringResDto("테마 사진이 생성되었습니다.(아직 구현X)"));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body(new StringResDto("테마 사진 생성에 실패했습니다: " + e.getMessage()));
 		}
@@ -67,9 +62,8 @@ public class MissionController {
 
 	@Operation(summary = "성공한 기록 조회", description = "성공한 미션을 조회합니다.")
 	@GetMapping("/me/success")
-	public ResponseEntity<List<MemoryResDto>> getSuccessMission(@AuthenticationPrincipal SecurityUser user,
-		@RequestParam("all") boolean all) {
-		return ResponseEntity.ok(missionService.getSuccessMission(user.getUsername(), all));
+	public ResponseEntity<List<MemoryResDto>> getSuccessMission(@AuthenticationPrincipal SecurityUser user) {
+		return ResponseEntity.ok(missionService.getSuccessMission(user.getUsername()));
 	}
 
 	@Operation(summary = "가족이 성공한 기록 조회", description = "가족이 성공한 미션을 조회합니다.")

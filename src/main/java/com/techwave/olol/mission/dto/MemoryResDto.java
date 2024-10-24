@@ -3,6 +3,9 @@ package com.techwave.olol.mission.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.techwave.olol.mission.domain.Memory;
+import com.techwave.olol.mission.domain.Mission;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -23,4 +26,16 @@ public class MemoryResDto {
 	LocalDateTime createdTime;
 	@Schema(example = "100L")
 	Long score;
+
+	public static MemoryResDto createMemoryResDto(Mission mission, Memory memory) {
+		MemoryResDto memoryResDto = new MemoryResDto();
+		memoryResDto.missionId = mission.getId();
+		memoryResDto.missionName = mission.getName();
+		memoryResDto.memoryId = memory.getId();
+		memoryResDto.imageUrl = memory.getImageUrl();
+		memoryResDto.createdUrl = memory.getCreateImageUrl();
+		memoryResDto.createdTime = memory.getCreatedTime();
+		memoryResDto.score = memory.getScore();
+		return memoryResDto;
+	}
 }

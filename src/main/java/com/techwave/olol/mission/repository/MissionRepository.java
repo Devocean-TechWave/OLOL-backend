@@ -1,5 +1,7 @@
 package com.techwave.olol.mission.repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,4 +14,6 @@ public interface MissionRepository extends JpaRepository<Mission, UUID> {
 	Optional<Mission> findById(UUID missionId);
 
 	public void deleteMissionById(UUID missionId);
+
+	public List<Mission> findAllByDate(LocalDate date);
 }

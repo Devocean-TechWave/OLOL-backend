@@ -16,7 +16,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MissionErrorCode implements BaseErrorCode {
 	@ExplainError("미션을 찾을 수 없을 때 발생하는 오류입니다.")
-	MISSION_NOT_FOUND(NOT_FOUND, "MISSION_404_1", "미션을 찾을 수 없습니다.");
+	MISSION_NOT_FOUND(NOT_FOUND, "MISSION_404_1", "미션을 찾을 수 없습니다."),
+	@ExplainError("오늘의 미션이 없는 경우 발생합니다.")
+	MISSION_NOT_EXIST(NOT_FOUND, "MISSION_404_2", "미션이 존재하지 않습니다.(오늘의 미션이)");
 
 	private final Integer status;
 	private final String code;
