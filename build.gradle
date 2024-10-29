@@ -90,6 +90,9 @@ dependencies {
     implementation 'mysql:mysql-connector-java:8.0.28'
 
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    // health check
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
