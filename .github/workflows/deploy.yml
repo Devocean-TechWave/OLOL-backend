@@ -47,7 +47,7 @@ jobs:
         run: |
           cd ./src/main/resources
           touch ./application-prod.yml
-          echo "${{ secrets.YML_PROD_INIT }}" > ./application-prod.yml
+          echo "${{ secrets.YML_PROD }}" > ./application-prod.yml
         shell: bash
 
       # Gradle 빌드
