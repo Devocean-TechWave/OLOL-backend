@@ -20,6 +20,10 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Gradle 캐시 삭제
+      - name: Clean Gradle Cache
+        run: rm -rf ~/.gradle/caches/
+
       # Gradle 캐싱
       - name: Gradle Caching
         uses: actions/cache@v3
