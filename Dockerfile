@@ -10,10 +10,14 @@ RUN ./gradlew bootJar
 
 FROM openjdk:17
 
-#build이미지에서 build/libs/*.jar 파일을 app.jar로 복사
+# Datadog Java Agent 추가
+COPY dd-java-agent.jar /usr/agent/dd-java-agent.jar
+
+# 빌드 이미지에서 app.jar 파일을 복사
 COPY --from=builder build/libs/*.jar app.jar
 
 # /tmp를 볼륨으로 지정
 VOLUME /tmp
-#app.jar를 실행
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+
+# app.jar 실행
+ENTRYPOINT ["java", "-javaagent:/usr/agent/dd-java-agent.jar", "-Ddd.agent.host=localhost", "-Ddd.profiling.enabled=true", "-XX:FlightRecorderOptions=stackdepth=256", "-Ddd.logs.injection=true", "-Ddd.service=discovery-api", "-Ddd.env=prod", "-Dspring.profiles.active=production", "-jar", "/app.jar"]
