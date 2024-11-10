@@ -50,6 +50,14 @@ jobs:
           echo "${{ secrets.YML_PROD }}" > ./application-prod.yml
         shell: bash
 
+      - name: check yml
+        run: |
+          cd ./src/main/resources
+          echo "=====application.yml====="
+          cat ./application.yml
+          echo "=====application-prod.yml====="
+          cat ./application-prod.yml
+
       # Gradle 빌드
       - name: Build with Gradle
         run: ./gradlew build -x checkstyleMain -x checkstyleTest -x editorconfigCheck -x test
