@@ -91,6 +91,9 @@ dependencies {
 
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
+    // JSONObject lib
+    implementation group: 'org.json', name: 'json', version: '20240303'
+
     // health check
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
